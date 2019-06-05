@@ -7,6 +7,7 @@
 #include "DeviceResources.h"
 #include "StepTimer.h"
 #include "pch.h"
+#include "Scene\SceneManager.h"
 
 
 // A basic game implementation that creates a D3D11 device and
@@ -53,4 +54,7 @@ private:
 
     // Rendering loop timer.
     DX::StepTimer                           m_timer;
+
+	// シーンマネージャー格納用
+	SceneManager* m_sceneManager;
 };

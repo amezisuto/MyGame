@@ -4,57 +4,84 @@
 
 #include "pch.h"
 #include "Game.h"
+#include "Scene\SceneManager.h"
+#include "InputManager.h"
+
+#if _DEBUG
+#define _CRTDBG_MAP_ALLOC
+#include <crtdbg.h>
+#define new new(_NORMAL_BLOCK, __FILE__, __LINE__)
+#endif
 
 extern void ExitGame();
 
 using namespace DirectX;
+using namespace DirectX::SimpleMath;
+
 
 using Microsoft::WRL::ComPtr;
 
 Game::Game()
 {
-    m_deviceResources = std::make_unique<DX::DeviceResources>();
-    m_deviceResources->RegisterDeviceNotify(this);
+	m_deviceResources = std::make_unique<DX::DeviceResources>();
+	m_deviceResources->RegisterDeviceNotify(this);
 }
 
 // Initialize the Direct3D resources required to run.
 void Game::Initialize(HWND window, int width, int height)
 {
-    m_deviceResources->SetWindow(window, width, height);
 
-    m_deviceResources->CreateDeviceResources();
-    CreateDeviceDependentResources();
+	//// デバッグカメラの作成
+	//m_debugCamera = std::make_unique<DebugCamera>(width, height);
 
-    m_deviceResources->CreateWindowSizeDependentResources();
-    CreateWindowSizeDependentResources();
+	m_deviceResources->SetWindow(window, width, height);
 
-    // TODO: Change the timer settings if you want something other than the default variable timestep mode.
-    // e.g. for 60 FPS fixed timestep update logic, call:
-    /*
-    m_timer.SetFixedTimeStep(true);
-    m_timer.SetTargetElapsedSeconds(1.0 / 60);
-    */
+	m_deviceResources->CreateDeviceResources();
+	CreateDeviceDependentResources();
+
+	m_deviceResources->CreateWindowSizeDependentResources();
+	CreateWindowSizeDependentResources();
+
+	// TODO: Change the timer settings if you want something other than the default variable timestep mode.
+	// e.g. for 60 FPS fixed timestep update logic, call:
+	/*
+	m_timer.SetFixedTimeStep(true);
+	m_timer.SetTargetElapsedSeconds(1.0 / 60);
+	*/
+
+	// シーンマネージャーの初期化-------------------
+	m_sceneManager = new SceneManager(SCENE_TITLE);
+	m_sceneManager->SetGame(this);
+	//----------------------------------------------
+
+
+
 }
 
 #pragma region Frame Update
 // Executes the basic game loop.
 void Game::Tick()
 {
-    m_timer.Tick([&]()
-    {
-        Update(m_timer);
-    });
+	m_timer.Tick([&]()
+	{
+		Update(m_timer);
+	});
 
-    Render();
+
+
+	Render();
 }
 
 // Updates the world.
 void Game::Update(DX::StepTimer const& timer)
 {
-    float elapsedTime = float(timer.GetElapsedSeconds());
+	float elapsedTime = float(timer.GetElapsedSeconds());
 
-    // TODO: Add your game logic here.
-    elapsedTime;
+	System::InputManager::GetInstance().Update();
+
+	// シーンマネージャーの更新-------------------
+	m_sceneManager->UpdateActiveScene(timer);
+	//----------------------------------------------
 }
 #pragma endregion
 
@@ -62,45 +89,53 @@ void Game::Update(DX::StepTimer const& timer)
 // Draws the scene.
 void Game::Render()
 {
-    // Don't try to render anything before the first Update.
-    if (m_timer.GetFrameCount() == 0)
-    {
-        return;
-    }
+	// Don't try to render anything before the first Update.
+	if (m_timer.GetFrameCount() == 0)
+	{
+		return;
+	}
 
-    Clear();
 
-    m_deviceResources->PIXBeginEvent(L"Render");
-    auto context = m_deviceResources->GetD3DDeviceContext();
+	Clear();
 
-    // TODO: Add your rendering code here.
-    context;
+	m_deviceResources->PIXBeginEvent(L"Render");
+	auto context = m_deviceResources->GetD3DDeviceContext();
 
-    m_deviceResources->PIXEndEvent();
+	// シーンマネージャーの描画---------------------
+	m_sceneManager->RenderActiveScene();
+	//----------------------------------------------
+	/// <summary>
+	/// //////////////////////////////////////////////////////////////////////////////
+	/// </summary>
 
-    // Show the new frame.
-    m_deviceResources->Present();
+	// ここまで
+
+	m_deviceResources->PIXEndEvent();
+
+	// Show the new frame.
+	m_deviceResources->Present();
 }
 
 // Helper method to clear the back buffers.
 void Game::Clear()
 {
-    m_deviceResources->PIXBeginEvent(L"Clear");
+	m_deviceResources->PIXBeginEvent(L"Clear");
 
-    // Clear the views.
-    auto context = m_deviceResources->GetD3DDeviceContext();
-    auto renderTarget = m_deviceResources->GetRenderTargetView();
-    auto depthStencil = m_deviceResources->GetDepthStencilView();
 
-    context->ClearRenderTargetView(renderTarget, Colors::CornflowerBlue);
-    context->ClearDepthStencilView(depthStencil, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-    context->OMSetRenderTargets(1, &renderTarget, depthStencil);
+	// Clear the views.
+	auto context = m_deviceResources->GetD3DDeviceContext();
+	auto renderTarget = m_deviceResources->GetRenderTargetView();
+	auto depthStencil = m_deviceResources->GetDepthStencilView();
 
-    // Set the viewport.
-    auto viewport = m_deviceResources->GetScreenViewport();
-    context->RSSetViewports(1, &viewport);
+	context->ClearRenderTargetView(renderTarget, Colors::Aquamarine);
+	context->ClearDepthStencilView(depthStencil, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	context->OMSetRenderTargets(1, &renderTarget, depthStencil);
 
-    m_deviceResources->PIXEndEvent();
+	// Set the viewport.
+	auto viewport = m_deviceResources->GetScreenViewport();
+	context->RSSetViewports(1, &viewport);
+
+	m_deviceResources->PIXEndEvent();
 }
 #pragma endregion
 
@@ -108,48 +143,42 @@ void Game::Clear()
 // Message handlers
 void Game::OnActivated()
 {
-    // TODO: Game is becoming active window.
+	// TODO: Game is becoming active window.
 }
 
 void Game::OnDeactivated()
 {
-    // TODO: Game is becoming background window.
+	// TODO: Game is becoming background window.
 }
 
 void Game::OnSuspending()
 {
-    // TODO: Game is being power-suspended (or minimized).
+	// TODO: Game is being power-suspended (or minimized).
 }
 
 void Game::OnResuming()
 {
-    m_timer.ResetElapsedTime();
+	m_timer.ResetElapsedTime();
 
-    // TODO: Game is being power-resumed (or returning from minimize).
-}
-
-void Game::OnWindowMoved()
-{
-    auto r = m_deviceResources->GetOutputSize();
-    m_deviceResources->WindowSizeChanged(r.right, r.bottom);
+	// TODO: Game is being power-resumed (or returning from minimize).
 }
 
 void Game::OnWindowSizeChanged(int width, int height)
 {
-    if (!m_deviceResources->WindowSizeChanged(width, height))
-        return;
+	if (!m_deviceResources->WindowSizeChanged(width, height))
+		return;
 
-    CreateWindowSizeDependentResources();
+	CreateWindowSizeDependentResources();
 
-    // TODO: Game window is being resized.
+	// TODO: Game window is being resized.
 }
 
 // Properties
 void Game::GetDefaultSize(int& width, int& height) const
 {
-    // TODO: Change to desired default window size (note minimum size is 320x200).
-    width = 800;
-    height = 600;
+	// TODO: Change to desired default window size (note minimum size is 320x200).
+	width = 800;
+	height = 600;
 }
 #pragma endregion
 
@@ -157,27 +186,59 @@ void Game::GetDefaultSize(int& width, int& height) const
 // These are the resources that depend on the device.
 void Game::CreateDeviceDependentResources()
 {
-    auto device = m_deviceResources->GetD3DDevice();
+	ID3D11Device* device = m_deviceResources->GetD3DDevice();
+	ID3D11DeviceContext* context = m_deviceResources->GetD3DDeviceContext();
 
-    // TODO: Initialize device dependent objects here (independent of window size).
-    device;
+	// TODO: Initialize device dependent objects here (independent of window size).
+	device;
+
+
+	
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.
 void Game::CreateWindowSizeDependentResources()
 {
-    // TODO: Initialize windows-size dependent objects here.
+	// TODO: Initialize windows-size dependent objects here.
+
+	// ウインドウサイズからアスペクト比を算出する
+	RECT size = m_deviceResources->GetOutputSize();
+	float aspectRatio = float(size.right) / float(size.bottom);
+
+	// 画角を設定
+	float fovAngleY = XMConvertToRadians(45.0f);
+
+	//// 射影行列を作成する
+	//m_projection = Matrix::CreatePerspectiveFieldOfView(
+	//	fovAngleY,
+	//	aspectRatio,
+	//	0.01f,
+	//	1000.0f
+	//);
+
+	// デバッグカメラにウインドウのサイズ変更を伝える
+	//m_debugCamera->SetWindowSize(size.right, size.bottom);
 }
 
 void Game::OnDeviceLost()
 {
-    // TODO: Add Direct3D resource cleanup here.
+	// TODO: Add Direct3D resource cleanup here.
+
+	
+
+	//ADX2Le* adx2le = ADX2Le::GetInstance();
+	//adx2le->Finalize();
+
 }
+
+
 
 void Game::OnDeviceRestored()
 {
-    CreateDeviceDependentResources();
+	CreateDeviceDependentResources();
 
-    CreateWindowSizeDependentResources();
+	CreateWindowSizeDependentResources();
 }
+
+
 #pragma endregion

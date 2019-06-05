@@ -1,6 +1,7 @@
 #include "../pch.h"
 #include "TitleScene.h"
 #include "SceneManager.h"
+#include "../InputManager.h"
 #include "../Game.h"
 
 
@@ -54,7 +55,11 @@ void TitleScene::Finalize()
 /// <param name="timer">ŠÔî•ñ</param>
 void TitleScene::Update(DX::StepTimer const& timer)
 {
+	auto kb = System::InputManager::GetInstance().GetKeyState();
+	if (kb.Space)
+	{
 
+	}
 }
 
 
