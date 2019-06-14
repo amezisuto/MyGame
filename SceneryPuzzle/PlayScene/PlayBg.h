@@ -3,15 +3,15 @@
 //---------------------------------------
 #pragma once
 
-#include "../TaskManager.h"
+#include "../Livr/Object.h"
 class Game;
 
-class PlayBg :public Task
+class PlayBg : public Object
 {
 public:
 	PlayBg();
 	~PlayBg();
-	void Initialize();
+	void Initialize(Game* game);
 
 	bool Update(float elapsedTime)override;
 	void Render()override;

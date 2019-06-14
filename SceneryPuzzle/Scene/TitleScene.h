@@ -2,11 +2,12 @@
 
 #include "SceneBase.h"
 #include "GameScene.h"
+#include "../TitleScene/Title.h"
+#include "../TitleScene/TitleBg.h"
+#include "../TitleScene/TitleUi.h"
+#include "../TaskManager.h"
 
-
-class Game;
-
-class TitleScene : public SceneBase
+class TitleScene : public SceneBase,public Task
 {
 	// <コンストラクタ>
 public:
@@ -25,10 +26,11 @@ public:
 	virtual void Render() override;
 	virtual void Finalize() override;
 
+private:
 
-
-public:
-	
+	Title* m_title;		// TitleClassのポインター
+	TitleBg* m_titleBg; // TitleBgClassのポインター
+	TitleUi* m_titleUi; // TitleUiClassのポインター
 
 
 };

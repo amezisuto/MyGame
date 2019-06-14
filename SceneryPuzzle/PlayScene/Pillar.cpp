@@ -1,0 +1,45 @@
+#include "Pillar.h"
+#include "../Scene/GameScene.h"
+
+using namespace DirectX;
+using namespace DirectX::SimpleMath;
+
+Pillar::Pillar()
+{
+}
+
+Pillar::~Pillar()
+{
+}
+
+void Pillar::Initialize(GameScene* gameScene, Kind kind, int x, int y, DirectX::Model * model)
+{
+	m_gameScene = gameScene;
+	m_model = model;
+	m_x = x;
+	m_y = y;
+	m_pos = Vector3((float)x, 0.0f, (float)y);
+	m_kind = kind;
+
+	// éøó 
+	m_weight = 0.1f;
+
+	// ñÄéCåWêî
+	m_coefficientOfFriction = 5.0f;
+
+	// îºåa
+	m_radius = 0.4f;
+
+	// ïùÇ∆çÇÇ≥
+	m_w = Pillar::WIDTH;
+	m_h = Pillar::HEIGHT;
+}
+
+bool Pillar::Update(float elapsedTime)
+{
+	return true;
+}
+
+void Pillar::Render()
+{
+}

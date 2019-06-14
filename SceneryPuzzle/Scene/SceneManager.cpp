@@ -6,7 +6,6 @@
 
 // ヘッダファイルのインクルード ===============================================
 #include "SceneManager.h"
-
 #include "SceneBase.h"
 #include "../Game.h"
 //#include "LogoScene.h"
@@ -17,8 +16,6 @@
 // usingディレクティブ ========================================================
 //using namespace MyLibrary;
 
-Game* SceneManager::m_game = nullptr;
-
 // メンバ関数の定義 ===========================================================
 /// <summary>
 /// コンストラクタ
@@ -27,6 +24,7 @@ Game* SceneManager::m_game = nullptr;
 SceneManager::SceneManager(SceneId startSceneId)
 	: m_activeScene(nullptr)
 	, m_requestedScene(nullptr)
+	, m_game(nullptr)
 {
 	// シーンリストの初期化
 	for (int i = 0; i < NUM_SCENES; i++)
@@ -39,8 +37,6 @@ SceneManager::SceneManager(SceneId startSceneId)
 	m_scenes[SCENE_TITLE] = new TitleScene(this);
 	//m_scenes[SCENE_STAGE] = new StageScene(this);
 	m_scenes[SCENE_PLAY] = new GameScene(this);
-
-
 	// 開始シーンの設定
 	RequestToChangeScene(startSceneId);
 }

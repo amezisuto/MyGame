@@ -3,6 +3,7 @@
 #include "SceneManager.h"
 #include "../InputManager.h"
 #include "../Game.h"
+#include "GameLi/GameManeger.h"
 
 
 using namespace DirectX;
@@ -17,7 +18,6 @@ extern void ExitGame();
 TitleScene::TitleScene(SceneManager* sceneManager)
 	: SceneBase(sceneManager)
 {
-
 }
 
 
@@ -35,7 +35,18 @@ TitleScene::~TitleScene()
 /// </summary>
 void TitleScene::Initialize()
 {
-
+	// ゲームタイトルの初期化----------------------------
+	m_title = GetTaskManager()->AddTask<Title>(this);
+	m_title->Initialize(m_sceneManager->GetGame());
+	//---------------------------------------------------
+	// タイトル背景の初期化------------------------------
+	m_titleBg = GetTaskManager()->AddTask<TitleBg>(this);
+	m_titleBg->Initialize(m_sceneManager->GetGame());
+	//---------------------------------------------------
+	// タイトルUIの初期化--------------------------------
+	m_titleUi = GetTaskManager()->AddTask<TitleUi>(this);
+	m_titleUi->Initialize(m_sceneManager->GetGame());
+	//---------------------------------------------------
 }
 
 
@@ -44,8 +55,11 @@ void TitleScene::Initialize()
 /// </summary>
 void TitleScene::Finalize()
 {
-
-
+	// ポインターを破棄------------------
+	m_sceneManager->PtrDel(m_title);
+	m_sceneManager->PtrDel(m_titleBg);
+	m_sceneManager->PtrDel(m_titleUi);
+	//-----------------------------------
 }
 
 
@@ -56,9 +70,17 @@ void TitleScene::Finalize()
 void TitleScene::Update(DX::StepTimer const& timer)
 {
 	auto kb = System::InputManager::GetInstance().GetKeyState();
+	float elapsedTime = float(timer.GetElapsedSeconds());
+
+	// 更新処理--------------------------------------------------
+	m_title->Update(elapsedTime);		// ゲームタイトルの更新
+	m_titleBg->Update(elapsedTime);		// タイトル背景の更新
+	m_titleUi->Update(elapsedTime);		// タイトルUIの更新
+	// ----------------------------------------------------------
+
 	if (kb.Space)
 	{
-
+		m_sceneManager->RequestToChangeScene(SCENE_PLAY);
 	}
 }
 
@@ -68,6 +90,10 @@ void TitleScene::Update(DX::StepTimer const& timer)
 /// </summary>
 void TitleScene::Render()
 {
-
+	// 描画処理-----------------------------------------
+	m_titleBg->Render();		// タイトル背景の描画
+	m_title->Render();			// ゲームタイトルの描画
+	m_titleUi->Render();		// タイトルUIの描画
+	//--------------------------------------------------
 }
 

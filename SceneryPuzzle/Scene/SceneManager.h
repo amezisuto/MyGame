@@ -50,8 +50,7 @@ private:
 	SceneBase* m_requestedScene;        // 要求されたシーン
 
 protected:
-	static Game* m_game;
-
+	Game* m_game;
 
 										// メンバ関数の宣言 ---------------------------------------------------
 										// <コンストラクタ>
@@ -70,11 +69,18 @@ public:
 	void RenderActiveScene();
 	bool RequestToChangeScene(SceneId sceneId);
 
+public:
+	// ポインター終了処理関数
+	template<typename T> static void PtrDel(T ptr)
+	{
+		delete ptr;
+		ptr = nullptr;
+	}
 private:
 	void ChangeScene();
 
 public:
-	static Game* GetGame() { return m_game; };
+	Game* GetGame() { return m_game; };
 
 	// ゲームオブジェクトを設定する関数
 	void SetGame(Game* game) { m_game = game; };

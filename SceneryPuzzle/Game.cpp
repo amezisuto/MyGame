@@ -4,7 +4,7 @@
 
 #include "pch.h"
 #include "Game.h"
-#include "Scene\SceneManager.h"
+#include "Scene/SceneManager.h"
 #include "InputManager.h"
 
 #if _DEBUG
@@ -177,8 +177,8 @@ void Game::OnWindowSizeChanged(int width, int height)
 void Game::GetDefaultSize(int& width, int& height) const
 {
 	// TODO: Change to desired default window size (note minimum size is 320x200).
-	width = 800;
-	height = 600;
+	width = 1280;
+	height = 720;
 }
 #pragma endregion
 
@@ -192,6 +192,28 @@ void Game::CreateDeviceDependentResources()
 	// TODO: Initialize device dependent objects here (independent of window size).
 	device;
 
+
+	// コモンステートの作成
+	m_states = std::make_unique<CommonStates>(device);
+
+	// スプライトバッチの作成
+	m_sprites = std::make_unique<SpriteBatch>(context);
+
+	// スプライトフォントの作成
+	m_font = std::make_unique<SpriteFont>(device, L"SegoeUI_18.spritefont");
+
+
+	// エフェクトの作成
+	m_batchEffect = std::make_unique<AlphaTestEffect>(device);
+	m_batchEffect->SetAlphaFunction(D3D11_COMPARISON_EQUAL);
+	m_batchEffect->SetReferenceAlpha(255);
+
+	// 入力レイアウト生成
+	void const* shaderByteCode;
+	size_t byteCodeLength;
+	m_batchEffect->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
+	device->CreateInputLayout(VertexPositionTexture::InputElements, VertexPositionTexture::InputElementCount,
+		shaderByteCode, byteCodeLength, m_inputLayout.GetAddressOf());
 
 	
 }
@@ -208,13 +230,13 @@ void Game::CreateWindowSizeDependentResources()
 	// 画角を設定
 	float fovAngleY = XMConvertToRadians(45.0f);
 
-	//// 射影行列を作成する
-	//m_projection = Matrix::CreatePerspectiveFieldOfView(
-	//	fovAngleY,
-	//	aspectRatio,
-	//	0.01f,
-	//	1000.0f
-	//);
+	// 射影行列を作成する
+	m_projection = Matrix::CreatePerspectiveFieldOfView(
+		fovAngleY,
+		aspectRatio,
+		0.01f,
+		1000.0f
+	);
 
 	// デバッグカメラにウインドウのサイズ変更を伝える
 	//m_debugCamera->SetWindowSize(size.right, size.bottom);
@@ -224,7 +246,20 @@ void Game::OnDeviceLost()
 {
 	// TODO: Add Direct3D resource cleanup here.
 
-	
+	m_states.reset();			// コモンステートの解放
+
+	m_sprites.reset();			// スプライトバッチの解放
+
+	m_font.reset();				// スプライトフォントの解放
+
+	m_keyboard.reset();			// キーボードの解放
+
+	m_mouse.reset();			// マウスの解放
+
+	m_deviceResources.reset();	// デバイスの解放
+
+	delete m_sceneManager;
+	m_sceneManager = nullptr;
 
 	//ADX2Le* adx2le = ADX2Le::GetInstance();
 	//adx2le->Finalize();
@@ -238,6 +273,11 @@ void Game::OnDeviceRestored()
 	CreateDeviceDependentResources();
 
 	CreateWindowSizeDependentResources();
+}
+
+DirectX::SpriteBatch* Game::GetSpriteBatch()
+{
+	return m_sprites.get();
 }
 
 

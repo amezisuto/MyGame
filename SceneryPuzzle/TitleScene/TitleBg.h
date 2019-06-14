@@ -11,12 +11,15 @@ class TitleBg :public Task
 public:
 	TitleBg();
 	~TitleBg();
-	void Initialize();
+	void Initialize(Game* game);
 
 	bool Update(float elapsedTime)override;
 	void Render()override;
 
 private:
 	Game* m_game;
-	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_title;
+	// テクスチャハンドル
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_tileTexture;
+	// スクロール値
+	float m_scroll;
 };

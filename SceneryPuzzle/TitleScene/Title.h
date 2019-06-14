@@ -11,12 +11,14 @@ class Title :public Task
 public:
 	Title();
 	~Title();
-	void Initialize();
+	void Initialize(Game* game);
 
 	bool Update(float elapsedTime)override;
 	void Render()override;
 
 private:
 	Game* m_game;
-	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_title;
+
+	// テクスチャハンドル
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_titleTexture;
 };
