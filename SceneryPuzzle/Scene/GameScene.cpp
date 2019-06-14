@@ -54,22 +54,22 @@ void GameScene::Initialize()
 	m_floor = GetTaskManager()->AddTask<Floor>(this);
 	//m_floor->Initialize();
 	//---------------------------------------------------
-	// ギミックの初期化----------------------------------
-	m_gimmick = GetTaskManager()->AddTask<Gimmick>(this);
-	m_gimmick->Initialize(m_sceneManager->GetGame());
-	//---------------------------------------------------
-	// 背景の初期化--------------------------------------
-	m_playBg = GetTaskManager()->AddTask<PlayBg>(this);
-	m_playBg->Initialize(m_sceneManager->GetGame());
-	//---------------------------------------------------
-	// プレイヤーの初期化--------------------------------
-	m_player = GetTaskManager()->AddTask<Player>(this);
-	m_player->Initialize(m_sceneManager->GetGame());
-	//---------------------------------------------------
-	// ステージの初期化----------------------------------
-	m_stage = GetTaskManager()->AddTask<Stage>(this);
-	m_stage->Initialize(this);
-	//---------------------------------------------------
+	//// ギミックの初期化----------------------------------
+	//m_gimmick = GetTaskManager()->AddTask<Gimmick>(this);
+	//m_gimmick->Initialize(m_sceneManager->GetGame());
+	////---------------------------------------------------
+	//// 背景の初期化--------------------------------------
+	//m_playBg = GetTaskManager()->AddTask<PlayBg>(this);
+	//m_playBg->Initialize(m_sceneManager->GetGame());
+	////---------------------------------------------------
+	//// プレイヤーの初期化--------------------------------
+	//m_player = GetTaskManager()->AddTask<Player>(this);
+	//m_player->Initialize(m_sceneManager->GetGame());
+	////---------------------------------------------------
+	//// ステージの初期化----------------------------------
+	//m_stage = GetTaskManager()->AddTask<Stage>(this);
+	//m_stage->Initialize(this);
+	////---------------------------------------------------
 }
 
 

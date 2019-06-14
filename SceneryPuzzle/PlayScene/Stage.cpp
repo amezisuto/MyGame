@@ -1,6 +1,6 @@
 #include "../Game.h"
 #include "Stage.h"
-#include "../Scene/GameScene.h"
+#include "PlayGame.h"
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
@@ -16,10 +16,10 @@ Stage::~Stage()
 }
 
 // 初期化
-void Stage::Initialize(GameScene* gameScene)
+void Stage::Initialize(PlayGame* playGame)
 {
-	m_gameScene = gameScene;
-	m_game = m_gameScene->GetGame();// Game.cppの情報の取得
+	m_playGame = playGame;
+	m_game = m_playGame->GetGame();// Game.cppの情報の取得
 
 	// モデルデータの読み込み
 	EffectFactory fx(m_game->GetDevice());
@@ -168,7 +168,7 @@ void Stage::SetStageData()
 			if (m_stageData.stage[i][j] == 2)
 			{
 				pillar = GetTaskManager()->AddTask<Pillar>(this);
-				pillar->Initialize(m_gameScene, Pillar::PILLAR, i, j, m_floorModels[Floor::PILLER].get());
+				pillar->Initialize(m_playGame, Pillar::PILLAR, i, j, m_floorModels[Floor::PILLER].get());
 				m_pillar.push_back(pillar);
 			}
 			// オブジェクトの種類によりタスク生成する
@@ -176,8 +176,8 @@ void Stage::SetStageData()
 			{
 			case OBJECT_ID::PLAYER:	// プレイヤー
 				m_player = GetTaskManager()->AddTask<Player>(this);
-				m_player->Initialize(m_gameScene, i, j, m_shadowModel.get());
-				m_player->SetModel(Player::NORMAL, m_playerModels[Player::NORMAL].get());
+				m_player->Initialize(m_playGame, i, j);
+				m_player->SetModel(Player::NORMAL, m_playerModels.get());
 				m_floors[j][i]->SetState(Floor::LODE);
 				m_floorStack.push(m_floors[j][i]);
 				m_floorX = i; m_floorY = j;
@@ -231,7 +231,7 @@ void Stage::SetStageData()
 				break;
 			case OBJECT_ID::BALL:	// ボール
 				ball = GetTaskManager()->AddTask<Gimmick>(this);
-				ball->Initialize(m_gameScene, Gimmick::BALL, i, j, m_ballModel.get());
+				ball->Initialize(m_playGame, Gimmick::BALL, i, j, m_ballModel.get());
 				// 床との判定関数を登録
 				ball->SetCheckFloorFunction([&](Object* object)
 				{
@@ -241,17 +241,17 @@ void Stage::SetStageData()
 				break;
 			case OBJECT_ID::TRY:		// △柱
 				tryB = GetTaskManager()->AddTask<Gimmick>(this);
-				tryB->Initialize(m_gameScene, Gimmick::TRY, i, j, m_tryModel.get());
+				tryB->Initialize(m_playGame, Gimmick::TRY, i, j, m_tryModel.get());
 				m_try.push_back(tryB);
 				break;
 			case OBJECT_ID::NOTB:	// 進入禁止柱
 				notB = GetTaskManager()->AddTask<Gimmick>(this);
-				notB->Initialize(m_gameScene, Gimmick::NOT, i, j, m_notModel.get());
+				notB->Initialize(m_playGame, Gimmick::NOT, i, j, m_notModel.get());
 				m_not.push_back(notB);
 				break;
 			case OBJECT_ID::GALE:	// ゴール
 				goal = GetTaskManager()->AddTask<Gimmick>(this);
-				goal->Initialize(m_gameScene, Gimmick::GOAL, i, j, m_goalModel.get());
+				goal->Initialize(m_playGame, Gimmick::GOAL, i, j, m_goalModel.get());
 				// 床との判定関数を登録
 				goal->SetCheckFloorFunction([&](Object* object)
 				{

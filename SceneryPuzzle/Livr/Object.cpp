@@ -9,16 +9,16 @@
 #include "../pch.h"
 #include "Object.h"
 #include "../Game.h"
-#include "../Scene/GameScene.h"
+#include"../PlayScene/PlayGame.h"
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
 Object::Object()
-	: m_gameScene(nullptr), m_model(nullptr), m_dir(0), m_weight(0.0f), m_coefficientOfFriction(0.0f), m_radius(0.0f), m_w(0.0f), m_h(0.0f), m_killFlag(false), m_hitFlag(false), m_displayFlag(true), m_activeFlag(true), m_x(0), m_y(0)
+	: m_playgame(nullptr), m_model(nullptr), m_dir(0), m_weight(0.0f), m_coefficientOfFriction(0.0f), m_radius(0.0f), m_w(0.0f), m_h(0.0f), m_killFlag(false), m_hitFlag(false), m_displayFlag(true), m_activeFlag(true), m_x(0), m_y(0)
 {
 	// •`‰æ‡‚Ìİ’è
-	SetOt(GameScene::OT_OBJECT);
+	SetOt(PlayGame::OT_OBJECT);
 }
 
 bool Object::Update(float elapsedTime)
@@ -33,16 +33,16 @@ bool Object::Update(float elapsedTime)
 
 void Object::Render()
 {
-	if (!m_gameScene || !m_model || !m_displayFlag) return;
+	if (!m_playgame || !m_model || !m_displayFlag) return;
 	
-	Game* game = m_gameScene->GetGame();
+	Game* game = m_playgame->GetGame();
 
 	// ƒ[ƒ‹ƒhs—ñ‚ğì¬
 	Matrix world = Matrix::CreateTranslation(m_pos);
 
 	// ƒ‚ƒfƒ‹‚Ì•`‰æ
 	m_model->Draw(game->GetContext(), *game->GetStates()
-		, world, m_gameScene->GetGame()->GetView(), m_gameScene->GetGame()->GetProjection());
+		, world, m_playgame->GetGame()->GetView(), m_playgame->GetGame()->GetProjection());
 }
 
 float Object::GetHitForce()
@@ -76,7 +76,7 @@ void Object::AddForce(float angle, float force)
 void Object::Friction(float elapsedTime)
 {
 	// –€C—Í = –€CŒW” ~ d—Í‰Á‘¬“x ~ ¿—Ê
-	float frictionForce = m_coefficientOfFriction * m_weight * GameScene::GRAVITY;
+	float frictionForce = m_coefficientOfFriction * m_weight * PlayGame::GRAVITY;
 
 	// –€C—Í‚É‚æ‚Á‚Ä‘¬“x‚ğ—‚Æ‚·
 	float v = (frictionForce / m_weight) * elapsedTime;

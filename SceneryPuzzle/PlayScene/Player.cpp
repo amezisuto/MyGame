@@ -9,7 +9,7 @@
 #include "../pch.h"
 #include "Player.h"
 #include "../Game.h"
-#include "../Scene/GameScene.h"
+#include "PlayGame.h"
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
@@ -37,9 +37,9 @@ Player::Player()
 	m_nextPos.y = 0;
 }
 
-void Player::Initialize(GameScene* gameScene, int x, int y)
+void Player::Initialize(PlayGame* playGame, int x, int y)
 {
-	m_gameScene = gameScene;
+	m_playgame = playGame;
 	m_x = x;
 	m_y = y;
 	m_pos = Vector3((float)x, 0.0f, (float)y);
@@ -101,7 +101,7 @@ bool Player::Update(float elapsedTime)
 	if (m_state != Player::STATE::STATE_DEAD && m_state != Player::STATE::STATE_FALL)
 	{
 		// 衝突判定マネージャーに登録
-		m_gameScene->AddCollision(this);
+		m_playgame->AddCollision(this);
 	}
 
 
@@ -110,12 +110,12 @@ bool Player::Update(float elapsedTime)
 
 void Player::Render()
 {
-	if (!m_gameScene || !m_models[NORMAL] || !m_displayFlag) return;
+	if (!m_playgame || !m_models[NORMAL] || !m_displayFlag) return;
 
-	Game* game = m_gameScene->GetGame();
+	Game* game = m_playgame->GetGame();
 
 	// 向いている角度を角度テーブルから取得
-	float angle = GameWindow::DIR_ANGLE[m_dir];
+	float angle = PlayGame::DIR_ANGLE[m_dir];
 
 	// 落下中の回転を加える
 	angle += m_fallRotateAngle;
@@ -125,7 +125,7 @@ void Player::Render()
 
 	// モデルの描画
 	m_models[NORMAL]->Draw(game->GetContext(), *game->GetStates()
-		, world, m_gameWindow->GetViewMatrix(), m_gameWindow->GetProjectionMatrix());
+		, world, m_playgame->GetViewMatrix(), m_playgame->GetProjectionMatrix());
 }
 
 void Player::State_Hit(float elapsedTime)
@@ -262,7 +262,7 @@ void Player::Reset()
 	m_state = STATE_NORMAL;
 	m_clear = NONE;
 	SetDisplayFlag(true);
-	SetOt(GameWindow::OT_OBJECT);
+	SetOt(PlayGame::OT_OBJECT);
 }
 
 void Player::SetNextFloorPos(DirectX::SimpleMath::Vector3 pos)
@@ -294,7 +294,7 @@ void Player::OnHit_Piller(Object * object)
 	v = object->GetPosition() - this->GetPosition();
 
 	// プレイヤーの向きベクトルを作成
-	playerAngle = GameWindow::DIR_ANGLE[m_dir];
+	playerAngle = PlayGame::DIR_ANGLE[m_dir];
 	rotY = Matrix::CreateRotationY(playerAngle);
 	playerDir = Vector3::Transform(playerDir, rotY);
 

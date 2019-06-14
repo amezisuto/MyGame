@@ -11,7 +11,7 @@
 #include "Pillar.h"
 #include "Gimmick.h"
 class Game;
-class GameScene;
+class PlayGame;
 
 class Stage : public Task
 {
@@ -48,7 +48,7 @@ private:
 	//	ゲームのポインター
 	Game* m_game;
 	//  ゲームシーンのポインター
-	GameScene* m_gameScene;
+	PlayGame* m_playGame;
 
 	// 床タスクへのポインタ
 	Floor* m_floors[STAGE_H][STAGE_W];
@@ -106,7 +106,10 @@ public:
 	Stage();
 
 	// 初期化関数
-	void Initialize(GameScene* gameScene);
+	void Initialize(PlayGame* playGame);
+
+	// ゲームウインドウのポインタを取得する関数
+	PlayGame* GetPlayGame() { return m_playGame; }
 
 	// ゲームオブジェクトのポインタを取得する関数
 	Game* GetGame();

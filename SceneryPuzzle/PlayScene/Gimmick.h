@@ -5,7 +5,7 @@
 
 #include "../Livr/Object.h"
 class Game;
-class GameScene;
+class PlayGame;
 
 class Gimmick : public Object
 {
@@ -21,7 +21,9 @@ public:
 
 		KIND_NUM
 	};
-
+	// 床との判定用の幅と高さ
+	static const float WIDTH;
+	static const float HEIGHT;
 private:
 	// パーツの種類
 	Kind m_kind;
@@ -29,7 +31,7 @@ private:
 public:
 	Gimmick();
 	~Gimmick();
-	void Initialize(GameScene* gameScene, Kind kind, int x, int y, DirectX::Model * model);
+	void Initialize(PlayGame* playGame, Kind kind, int x, int y, DirectX::Model * model);
 
 	bool Update(float elapsedTime)override;
 	void Render()override;
@@ -41,5 +43,4 @@ public:
 
 private:
 	Game* m_game;
-	GameScene* m_gameScene;
 };

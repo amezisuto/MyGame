@@ -9,7 +9,7 @@
 #include "../pch.h"
 #include "Floor.h"
 #include "../Game.h"
-#include "../Scene/GameScene.h"
+#include "PlayGame.h"
 #include "Stage.h"
 
 // ダメージの移行時間
@@ -22,7 +22,7 @@ Floor::Floor()
 	: m_stage(nullptr), m_models{ nullptr }, m_state(NONE), m_lodeFlag(false), m_lodeTimer(0.0f)
 {
 	// 描画順の設定
-	SetOt(GameScene::OT_STAGE);
+	SetOt(PlayGame::OT_STAGE);
 }
 
 void Floor::Initialize(Stage * stage, int x, int y)
@@ -88,8 +88,8 @@ void Floor::Render()
 	// モデルの描画
 	m_models[state]->Draw(game->GetContext(), *game->GetStates()
 		, world
-		, m_stage->GetGameWindow()->GetViewMatrix()
-		, m_stage->GetGameWindow()->GetProjectionMatrix(), false, [&]()
+		, m_stage->GetPlayGame()->GetViewMatrix()
+		, m_stage->GetPlayGame()->GetProjectionMatrix(), false, [&]()
 	{
 		// 床は半透明の加算合成（半透明で暗くなってしまうので）
 		game->GetContext()->OMSetBlendState(game->GetStates()->Additive(), nullptr, 0xffffffff);

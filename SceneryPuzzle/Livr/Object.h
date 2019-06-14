@@ -10,7 +10,7 @@
 
 #include "../TaskManager.h"
 
-class GameScene;
+class PlayGame;
 
 // オブジェクトクラス
 class Object : public Task
@@ -31,8 +31,8 @@ public:
 
 protected:
 
-	// ゲームウインドウへのポインタ
-	GameScene* m_gameScene;
+	// プレイへのポインタ
+	PlayGame* m_playgame;
 
 	// モデルデータへのポインタ
 	DirectX::Model* m_model;

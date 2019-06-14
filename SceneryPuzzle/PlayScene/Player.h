@@ -4,8 +4,8 @@
 #pragma once
 
 #include "../Livr/Object.h"
-class Game;
-class GameScene;
+class PlayGame;
+
 class Player : public Object
 {
 public:
@@ -115,7 +115,7 @@ public:
 	Player();
 
 	// ‰Šú‰»ŠÖ”
-	void Initialize(GameScene* gameScene, int x, int y);
+	void Initialize(PlayGame* playGame, int x, int y);
 
 	// ƒ‚ƒfƒ‹İ’èŠÖ”
 	void SetModel(ModelType modelType, DirectX::Model* model);

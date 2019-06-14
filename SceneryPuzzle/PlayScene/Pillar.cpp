@@ -1,5 +1,5 @@
 #include "Pillar.h"
-#include "../Scene/GameScene.h"
+#include "PlayGame.h"
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
@@ -12,9 +12,9 @@ Pillar::~Pillar()
 {
 }
 
-void Pillar::Initialize(GameScene* gameScene, Kind kind, int x, int y, DirectX::Model * model)
+void Pillar::Initialize(PlayGame* playGame, Kind kind, int x, int y, DirectX::Model * model)
 {
-	m_gameScene = gameScene;
+	m_playgame = playGame;
 	m_model = model;
 	m_x = x;
 	m_y = y;

@@ -36,13 +36,12 @@ private:
 public:
 	Pillar();
 	~Pillar();
-	void Initialize(GameScene* gameScene, Kind kind, int x, int y, DirectX::Model * model);
+	void Initialize(PlayGame* playGame, Kind kind, int x, int y, DirectX::Model * model);
 
 	bool Update(float elapsedTime)override;
 	void Render()override;
 
 private:
 	Game* m_game;
-	GameScene* m_gameScene;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_title;
 };
