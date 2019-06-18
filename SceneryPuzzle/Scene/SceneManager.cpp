@@ -9,7 +9,7 @@
 #include "SceneBase.h"
 #include "../Game.h"
 //#include "LogoScene.h"
-//#include "StageScene.h"
+#include "SerectScene.h"
 #include "GameScene.h"
 #include "TitleScene.h"
 
@@ -35,7 +35,7 @@ SceneManager::SceneManager(SceneId startSceneId)
 	// シーンオブジェクトをリストに登録
 	//m_scenes[SCENE_LOGO] = new LogoScene(this);
 	m_scenes[SCENE_TITLE] = new TitleScene(this);
-	//m_scenes[SCENE_STAGE] = new StageScene(this);
+	m_scenes[SCENE_STAGE] = new SerectScene(this);
 	m_scenes[SCENE_PLAY] = new GameScene(this);
 	// 開始シーンの設定
 	RequestToChangeScene(startSceneId);

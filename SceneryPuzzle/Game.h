@@ -46,6 +46,8 @@ public:
 	// デバイスを取得する
 	ID3D11Device* GetDevice() { return m_deviceResources->GetD3DDevice(); };
 
+	DX::DeviceResources* GetResources() { return m_deviceResources.get(); }
+
 	// コモンステートを取得する
 	DirectX::CommonStates* GetStates() { return m_states.get(); };
 

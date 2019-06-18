@@ -4,10 +4,10 @@
 
 #include "../PlayScene/Stage.h"
 #include "../TaskManager.h"
-#include "../PlayScene/PlayGame.h"
+#include "../SerectScene/SerectGame.h"
 
 
-class GameScene : public SceneBase, public Task
+class SerectScene : public SceneBase, public Task
 {
 	// 画面サイズ
 	static const int SCREEN_W = 960;
@@ -60,12 +60,12 @@ class GameScene : public SceneBase, public Task
 
 	// <コンストラクタ>
 public:
-	GameScene(SceneManager* sceneManager);	
+	SerectScene(SceneManager* sceneManager);
 
 
 	// <デストラクタ>
 public:
-	virtual ~GameScene();
+	virtual ~SerectScene();
 
 
 	// <操作>
@@ -84,7 +84,7 @@ private:
 	//PlayBg* m_playBg;	// PlayBgClassのポインター
 	//Player* m_player;	// PlayerClassのポインター
 	Stage* m_stage;		// StageClassのポインター
-	PlayGame* m_playGmae;
+	SerectGame* m_serectGmae;
 
 	// タスクマネージャー（ゲーム画面用）
 	TaskManager m_gameTM;

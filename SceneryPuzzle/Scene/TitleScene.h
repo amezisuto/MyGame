@@ -32,5 +32,6 @@ private:
 	TitleBg* m_titleBg; // TitleBgClassのポインター
 	TitleUi* m_titleUi; // TitleUiClassのポインター
 
+	TaskManager m_titleTM;
 
 };

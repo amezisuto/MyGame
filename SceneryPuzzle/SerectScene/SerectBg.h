@@ -4,12 +4,12 @@
 #pragma once
 
 #include "../TaskManager.h"
-class PlayGame;
+class SerectGame;
 
-class PlayBg : public Task
+class SerectBg : public Task
 {
 	// ゲームウインドウへのポインタ
-	PlayGame* m_playGame;
+	SerectGame* m_serectGame;
 
 	// モデルデータへのポインタ
 	std::unique_ptr<DirectX::Model> m_model;
@@ -19,10 +19,10 @@ class PlayBg : public Task
 
 public:
 	// コンストラクタ
-	PlayBg();
+	SerectBg();
 
 	// 初期化関数
-	void Initialize(PlayGame* playGame);
+	void Initialize(SerectGame* serectGame);
 
 	// 更新関数
 	bool Update(float elapsedTime) override;

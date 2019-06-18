@@ -7,47 +7,45 @@
 // Author: Takeshi Yamaguthi
 //--------------------------------------------------------------------------------------
 #include "../pch.h"
-#include "Player.h"
+#include "SerectPlayer.h"
 #include "../Game.h"
-#include "PlayGame.h"
+#include "SerectGame.h"
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
 // プレイヤーの重さ
-const float Player::WEIGHT = 1.0f;
+const float SerectPlayer::WEIGHT = 1.0f;
 
 // 床に対する摩擦係数
-const float Player::FRICTION = 0.1f;
+const float SerectPlayer::FRICTION = 0.1f;
 
 // 床との判定用の幅と高さ
-const float Player::WIDTH = 0.2f;
-const float Player::HEIGHT = 0.2f;
+const float SerectPlayer::WIDTH = 0.2f;
+const float SerectPlayer::HEIGHT = 0.2f;
 
 // オブジェクト同士の判定用の半径
-const float Player::RADIUS = 0.4f;
+const float SerectPlayer::RADIUS = 0.4f;
 
 // ジャンプしているフレーム数
-const int Player::JUMP_FRAME = 30;
+const int SerectPlayer::JUMP_FRAME = 30;
 
 // ジャンプの高さ
-const float Player::JUMP_HEIGHT = 2.0f;
+const float SerectPlayer::JUMP_HEIGHT = 1.5f;
 
 // プレイヤーの最大移動速度
-const float Player::MAX_SPEED = 0.05f;
+const float SerectPlayer::MAX_SPEED = 0.05f;
 
-Player::Player()
+SerectPlayer::SerectPlayer()
 	: m_models{ nullptr }, m_powerupParts(0), m_jumpParts(false), m_state(STATE_NORMAL),  m_jumpCounter(0), m_fallRotateAngle(0.0f), m_floorCheck(false), m_moveFlag(false)
 {
 	m_nextPos.x = 0;
 	m_nextPos.y = 0;
-	m_chengeFloortPos.x = 0;
-	m_chengeFloortPos.y = 0;
 }
 
-void Player::Initialize(PlayGame* playGame, int x, int y)
+void SerectPlayer::Initialize(SerectGame* serectGame, int x, int y)
 {
-	m_playgame = playGame;
+	m_serectgame = serectGame;
 	m_x = x;
 	m_y = y;
 	m_pos = Vector3((float)x, 0.0f, (float)y);
@@ -59,18 +57,18 @@ void Player::Initialize(PlayGame* playGame, int x, int y)
 	m_notMoveFlag = false;
 
 	// 幅と高さ
-	m_w = Player::WIDTH;
-	m_h = Player::HEIGHT;
+	m_w = SerectPlayer::WIDTH;
+	m_h = SerectPlayer::HEIGHT;
 
 	Reset();
 }
 
-void Player::SetModel(ModelType modelType, DirectX::Model * model)
+void SerectPlayer::SetModel(ModelType modelType, DirectX::Model * model)
 {
 	m_models[modelType] = model;
 }
 
-bool Player::Update(float elapsedTime)
+bool SerectPlayer::Update(float elapsedTime)
 {
 	// 削除リクエストがあればタスクを削除
 	if (m_killFlag == true) return false;
@@ -99,36 +97,35 @@ bool Player::Update(float elapsedTime)
 	case STATE_JUMP:
 		State_Jump(elapsedTime);
 		break;
-
 	case STATE_NORMAL:	// 通常
 		break;
 	case STATE_HIT:		// ヒット中
 		State_Hit(elapsedTime);
 		break;
-	case STATE_SERECTJUMP:
-		Serect_Jump(elapsedTime);
-		break;
-	case STATE_NEXTJUMP:
-		Next_Jump(elapsedTime);
-		break;
 	default:
 		break;
 	}
 
-	// 衝突判定マネージャーに登録
-	m_playgame->AddCollision(this);
+
+	// プレイヤーが死亡または落下中以外は衝突する
+	if (m_state != SerectPlayer::STATE::STATE_DEAD && m_state != SerectPlayer::STATE::STATE_FALL)
+	{
+		// 衝突判定マネージャーに登録
+		m_serectgame->AddCollision(this);
+	}
+
 
 	return true;
 }
 
-void Player::Render()
+void SerectPlayer::Render()
 {
 	if (!m_playgame || !m_models[NORMAL] || !m_displayFlag) return;
 
-	Game* game = m_playgame->GetGame();
+	Game* game = m_serectgame->GetGame();
 
 	// 向いている角度を角度テーブルから取得
-	float angle = PlayGame::DIR_ANGLE[m_dir];
+	float angle = SerectGame::DIR_ANGLE[m_dir];
 
 	// 落下中の回転を加える
 	angle += m_fallRotateAngle;
@@ -138,10 +135,10 @@ void Player::Render()
 
 	// モデルの描画
 	m_models[NORMAL]->Draw(game->GetContext(), *game->GetStates()
-		, world, m_playgame->GetViewMatrix(), m_playgame->GetProjectionMatrix());
+		, world, m_serectgame->GetViewMatrix(), m_serectgame->GetProjectionMatrix());
 }
 
-void Player::State_Hit(float elapsedTime)
+void SerectPlayer::State_Hit(float elapsedTime)
 {
 	// 摩擦により停止したら
 	if (m_v == Vector3::Zero)
@@ -157,7 +154,7 @@ void Player::State_Hit(float elapsedTime)
 	}
 }
 
-void Player::OnHit(Object * object)
+void SerectPlayer::OnHit(Object * object)
 {
 	// 衝突した相手によって処理を変える
 	switch (object->GetID())
@@ -180,67 +177,47 @@ void Player::OnHit(Object * object)
 	}
 }
 
-Player::STATE Player::GetState()
+SerectPlayer::STATE SerectPlayer::GetState()
 {
 	return m_state;
 }
 
-Player::STATE_END Player::GetStateEnd()
+SerectPlayer::STATE_END SerectPlayer::GetStateEnd()
 {
 	return m_clear;
 }
-void Player::SetFloorCheck(bool flag)
+void SerectPlayer::SetFloorCheck(bool flag)
 {
 	m_floorCheck = flag;
 }
 
-void Player::SetNotMoveFlag(bool flag)
+void SerectPlayer::SetNotMoveFlag(bool flag)
 {
 	m_notMoveFlag = flag;
 }
 
-void Player::SetNextPosX(int x)
+void SerectPlayer::SetNextPosX(int x)
 {
 	m_nextPos.x = x;
 }
 
-void Player::SetNextPosY(int y)
+void SerectPlayer::SetNextPosY(int y)
 {
 	m_nextPos.y = y;
 }
 
-void Player::SetChengPosX(int x)
-{
-	m_chengeFloortPos.x = x;
-}
-
-void Player::SetChengPosY(int y)
-{
-	m_chengeFloortPos.y = y;
-}
-
-int Player::GetNextPosX()
+int SerectPlayer::GetNextPosX()
 {
 	return m_nextPos.x;
 }
 
-int Player::GetNextPosY()
+int SerectPlayer::GetNextPosY()
 {
 	return m_nextPos.y;
 }
 
-int Player::GetChengPosX()
-{
-	return m_chengeFloortPos.x;
-}
 
-int Player::GetChengPosY()
-{
-	return m_chengeFloortPos.y;
-}
-
-
-void Player::Move(float elapsedTime, const DirectX::Keyboard::KeyboardStateTracker& tracker)
+void SerectPlayer::Move(float elapsedTime, const DirectX::Keyboard::KeyboardStateTracker& tracker)
 {
 	// プレイヤーが通常、ジャンプ時のみ移動する
 	if (m_state != STATE_NORMAL && m_state != STATE_JUMP) return;
@@ -249,19 +226,16 @@ void Player::Move(float elapsedTime, const DirectX::Keyboard::KeyboardStateTrack
 	auto kb = Keyboard::Get().GetState();
 
 	// 方向キーが押されたら
-	if (kb.Up || kb.Down || kb.Left || kb.Right)
+	if (tracker.pressed.Up || tracker.pressed.Down || tracker.pressed.Left || tracker.pressed.Right)
 	{
-		if (m_state != STATE_JUMP)
-		{
-			// 押された方向キーのビットを立てる
-			if (kb.Up) m_nextPos.y = -1;
-			else if (kb.Down) m_nextPos.y = 1;
-			else if (kb.Left) m_nextPos.x = -1;
-			else if (kb.Right) m_nextPos.x = 1;
-			if (m_floorMove) m_floorMove(this);
-			m_state = STATE_JUMP;
-			m_jumpCounter = JUMP_FRAME;
-		}
+		// 押された方向キーのビットを立てる
+		if (tracker.pressed.Up) m_nextPos.y = -1;
+		else if (tracker.pressed.Down) m_nextPos.y = 1;
+		else if (tracker.pressed.Left) m_nextPos.x = -1;
+		else if (tracker.pressed.Right) m_nextPos.x = 1;
+		if (m_floorMove) m_floorMove(this);
+		m_state = STATE_JUMP;
+		m_jumpCounter = JUMP_FRAME;
 	}
 	if (m_floorCheck)
 	{
@@ -275,56 +249,25 @@ void Player::Move(float elapsedTime, const DirectX::Keyboard::KeyboardStateTrack
 	}
 }
 
-void Player::SerectMove(float elapsedTime, const DirectX::Keyboard::KeyboardStateTracker & tracker)
-{
-	// プレイヤーが通常、ジャンプ時のみ移動する
-	if (m_state != STATE_NORMAL && m_state != STATE_JUMP) return;
 
-	// キー入力を取得
-	auto kb = Keyboard::Get().GetState();
-
-	// 方向キーが押されたら
-	if ( tracker.pressed.Left || tracker.pressed.Right)
-	{
-		// 押された方向キーのビットを立てる
-		m_state = STATE_SERECTJUMP;
-		m_jumpCounter = JUMP_FRAME;
-	}
-	//if (m_floorCheck)
-	//{
-	//	m_nextPos.x = 0;
-	//	m_nextPos.y = 0;
-	//	m_velocity += (m_target - this->GetPosition()) * m_speed;
-	//	m_velocity *= m_attenuation;
-	//	m_pos += m_velocity*elapsedTime;
-	//	//if (m_target.x+0.2f >= m_pos.x&&m_target.x - 0.2f <= m_pos.x&&m_target.z + 0.2f >= m_pos.z&&m_target.z - 0.2f <= m_pos.z)
-	//	//	m_floorCheck=false;
-	//}
-}
-
-
-void Player::SetFloorMove(std::function<void(Object*)> func)
+void SerectPlayer::SetFloorMove(std::function<void(Object*)> func)
 {
 	// 移動時に呼ばれる関数を登録する
 	m_floorMove = func;
 }
 
-void Player::SetFloorBackMove(std::function<void(Object*)> func)
+void SerectPlayer::SetFloorBackMove(std::function<void(Object*)> func)
 {
 	// 移動時に呼ばれる関数を登録する
 	m_floorBackMove = func;
 }
 
-void Player::SetFloorCheckBack(std::function<void(Object*)> func)
+void SerectPlayer::SetFloorCheckBack(std::function<void(Object*)> func)
 {
 	// 移動時に呼ばれる関数を登録する
 	m_floorCheckBack = func;
 }
-void Player::SetChengeFloor(std::function<void(Object*)> func)
-{
-	m_floorCheng = func;
-}
-void Player::Reset()
+void SerectPlayer::Reset()
 {
 	// プレイヤーを元の状態に戻す
 	m_dir = 0;
@@ -332,22 +275,22 @@ void Player::Reset()
 	m_state = STATE_NORMAL;
 	m_clear = NONE;
 	SetDisplayFlag(true);
-	SetOt(PlayGame::OT_OBJECT);
+	SetOt(SerectGame::OT_OBJECT);
 }
 
-void Player::SetNextFloorPos(DirectX::SimpleMath::Vector3 pos)
+void SerectPlayer::SetNextFloorPos(DirectX::SimpleMath::Vector3 pos)
 {
 	m_target = pos;
 }
 
-int Player::GetKeyToDir(int key)
+int SerectPlayer::GetKeyToDir(int key)
 {
 	// ビットフィールドのキー情報を８方向(0～7）に変換するテーブル
 	int table[16] = { -1, 0, 2, 1, 4, -1, 3, -1, 6, 7, -1, -1, 5, -1, -1, -1 };
 	return table[key];
 }
 
-void Player::OnHit_Piller(Object * object)
+void SerectPlayer::OnHit_Piller(Object * object)
 {
 	Vector3 playerDir = Vector3(0.0f, 0.0f, -1.0f);
 	Vector3 v;
@@ -364,7 +307,7 @@ void Player::OnHit_Piller(Object * object)
 	v = object->GetPosition() - this->GetPosition();
 
 	// プレイヤーの向きベクトルを作成
-	playerAngle = PlayGame::DIR_ANGLE[m_dir];
+	playerAngle = SerectGame::DIR_ANGLE[m_dir];
 	rotY = Matrix::CreateRotationY(playerAngle);
 	playerDir = Vector3::Transform(playerDir, rotY);
 
@@ -397,7 +340,7 @@ void Player::OnHit_Piller(Object * object)
 	m_state = STATE_HIT;
 }
 
-void Player::State_Jump(float elapsedTime)
+void SerectPlayer::State_Jump(float elapsedTime)
 {
 	// ジャンプの処理
 	if (m_jumpCounter != 0)
@@ -414,57 +357,10 @@ void Player::State_Jump(float elapsedTime)
 			m_pos.y = 0.0f;
 			// 通常の状態へ
 			m_state = STATE_NORMAL;
-			if (m_floorCheng) m_floorCheng(this);
+			// 床にダメージを与える
+			if (m_floorMove) m_floorMove(this);
 		}
 	}
-}
-
-void Player::Serect_Jump(float elapsedTime)
-{
-	// ジャンプの処理
-	if (m_jumpCounter != 0)
-	{
-		// ゲームっぽいジャンプにするため、サイン波でジャンプ時の高さを算出する
-		m_jumpCounter--;
-		int cnt = JUMP_FRAME - m_jumpCounter;
-		float angle = 180.0f / (float)JUMP_FRAME * cnt;
-		m_pos.y = sinf(XMConvertToRadians(angle)) * 10.0f;
-
-		if (m_jumpCounter == 0)
-		{
-			// 床に着地した
-			m_pos.y = 0.0f;
-			// 通常の状態へ
-			m_state = STATE_NORMAL;
-		}
-	}
-}
-
-void Player::Next_Jump(float elapsedTime)
-{
-	// ジャンプの処理
-	if (m_jumpCounter != 0)
-	{
-		// ゲームっぽいジャンプにするため、サイン波でジャンプ時の高さを算出する
-		m_jumpCounter--;
-		int cnt = JUMP_FRAME - m_jumpCounter;
-		float angle = 180.0f / (float)JUMP_FRAME * cnt;
-		m_pos.y = sinf(XMConvertToRadians(angle)) * 10.0f;
-
-		if (m_jumpCounter == 0)
-		{
-			// 床に着地した
-			m_pos.y = 0.0f;
-			// 通常の状態へ
-			m_state = STATE_NORMAL;
-		}
-	}
-}
-
-void Player::SerectNextPos(int x, int y)
-{
-	m_serectNextPos.x = x;
-	m_serectNextPos.y = y;
 }
 
 

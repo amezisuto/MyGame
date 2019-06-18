@@ -4,9 +4,9 @@
 #pragma once
 
 #include "../Livr/Object.h"
-class PlayGame;
+class SerectGame;
 
-class Pillar :public Object
+class SerectPillar :public Object
 {
 public:
 	// ÉpÅ[ÉcÇÃéÌóﬁ
@@ -33,8 +33,8 @@ private:
 	Kind m_kind;
 
 public:
-	Pillar();
-	void Initialize(PlayGame* playGame, Kind kind, int x, int y, DirectX::Model * model);
+	SerectPillar();
+	void Initialize(SerectGame* serectGame, Kind kind, int x, int y, DirectX::Model * model);
 
 	bool Update(float elapsedTime)override;
 

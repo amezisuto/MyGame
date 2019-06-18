@@ -1,28 +1,28 @@
 #include "../Game.h"
-#include "Stage.h"
-#include "PlayGame.h"
+#include "SerectStage.h"
+#include "SerectGame.h"
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
 // コンストラクタ
-Stage::Stage()
- : m_floors{ nullptr }, m_player(nullptr), m_stageData{ 0 }, m_startPosX(0), m_startPosY(0)
+SerectStage::SerectStage()
+ : m_floors{ nullptr }, m_player(nullptr), m_stageData{ 0 }
 {
 }
 
 // 初期化
-void Stage::Initialize(PlayGame* playGame)
+void SerectStage::Initialize(SerectGame* serectGame)
 {
-	m_playGame = playGame;
-	m_game = m_playGame->GetGame();// Game.cppの情報の取得
+	m_serectGame = serectGame;
+	m_game = m_serectGame->GetGame();// Game.cppの情報の取得
 
 	// モデルデータの読み込み
 	EffectFactory fx(m_game->GetDevice());
 	fx.SetDirectory(L"Resources\\Models");
-	m_floorModels[Floor::NORMAL] = Model::CreateFromCMO(m_game->GetDevice(), L"Resources\\Models\\floorPanel_00.cmo", fx);
-	m_floorModels[Floor::PILLER] = Model::CreateFromCMO(m_game->GetDevice(), L"Resources\\Models\\hasira.cmo", fx);
-	m_floorModels[Floor::LODE] = Model::CreateFromCMO(m_game->GetDevice(), L"Resources\\Models\\keiro.cmo", fx);
+	m_floorModels[SerectFloor::NORMAL] = Model::CreateFromCMO(m_game->GetDevice(), L"Resources\\Models\\floorPanel_00.cmo", fx);
+	m_floorModels[SerectFloor::PILLER] = Model::CreateFromCMO(m_game->GetDevice(), L"Resources\\Models\\hasira.cmo", fx);
+	m_floorModels[SerectFloor::LODE] = Model::CreateFromCMO(m_game->GetDevice(), L"Resources\\Models\\keiro.cmo", fx);
 	m_playerModels = Model::CreateFromCMO(m_game->GetDevice(), L"Resources\\Models\\start.cmo", fx);
 	m_ballModel = Model::CreateFromCMO(m_game->GetDevice(), L"Resources\\Models\\Key.cmo", fx);
 	m_tryModel = Model::CreateFromCMO(m_game->GetDevice(), L"Resources\\Models\\try.cmo", fx);
@@ -31,12 +31,12 @@ void Stage::Initialize(PlayGame* playGame)
 
 	
 }
-Game * Stage::GetGame()
+Game * SerectStage::GetGame()
 {
 	return m_game;
 }
 
-Floor * Stage::GetFloor(int x, int y)
+SerectFloor * SerectStage::GetFloor(int x, int y)
 {
 	if (x >= 0 && x < STAGE_W && y >= 0 && y < STAGE_H)
 	{
@@ -45,7 +45,7 @@ Floor * Stage::GetFloor(int x, int y)
 	return nullptr;
 }
 
-bool Stage::LoadStageData(wchar_t * fname)
+bool SerectStage::LoadStageData(wchar_t * fname)
 {
 	std::wstring str;
 
@@ -118,19 +118,19 @@ bool Stage::LoadStageData(wchar_t * fname)
 	return true;
 }
 
-void Stage::SetStageData()
+void SerectStage::SetStageData()
 {
 	// 床のタスク生成
 	for (int j = 0; j < STAGE_H; j++)
 	{
 		for (int i = 0; i < STAGE_W; i++)
 		{
-			m_floors[j][i] = GetTaskManager()->AddTask<Floor>(this);
+			m_floors[j][i] = GetTaskManager()->AddTask<SerectFloor>(this);
 			m_floors[j][i]->Initialize(this, i, j);
 			// 各状態のモデルを設定
-			m_floors[j][i]->SetModel(Floor::NORMAL, m_floorModels[Floor::NORMAL].get());
-			m_floors[j][i]->SetModel(Floor::PILLER, m_floorModels[Floor::PILLER].get());
-			m_floors[j][i]->SetModel(Floor::LODE, m_floorModels[Floor::LODE].get());
+			m_floors[j][i]->SetModel(SerectFloor::NORMAL, m_floorModels[SerectFloor::NORMAL].get());
+			m_floors[j][i]->SetModel(SerectFloor::PILLER, m_floorModels[SerectFloor::PILLER].get());
+			m_floors[j][i]->SetModel(SerectFloor::LODE, m_floorModels[SerectFloor::LODE].get());
 		}
 	}
 
@@ -142,7 +142,7 @@ void Stage::SetStageData()
 			if (m_stageData.stage[i][j] == 1)
 			{
 				//m_floors[j][i]->Alive();
-				m_floors[j][i]->SetState(static_cast<Floor::State>(m_stageData.stage[j][i]));
+				m_floors[j][i]->SetState(static_cast<SerectFloor::State>(m_stageData.stage[j][i]));
 			}
 		}
 	}
@@ -153,11 +153,11 @@ void Stage::SetStageData()
 
 	//----- 各タスクの生成 -----//
 
-	Gimmick* ball;
-	Gimmick* tryB;
-	Gimmick* notB;
-	Pillar* pillar;
-	Gimmick* goal;
+	SerectGimmick* ball;
+	SerectGimmick* tryB;
+	SerectGimmick* notB;
+	SerectPillar* pillar;
+	SerectGimmick* goal;
 
 	// ステージ上のオブジェクトを配置する
 	for (int j = 0; j < STAGE_H; j++)
@@ -166,28 +166,20 @@ void Stage::SetStageData()
 		{
 			if (m_stageData.stage[i][j] == 2)
 			{
-				pillar = GetTaskManager()->AddTask<Pillar>(this);
-				pillar->Initialize(m_playGame, Pillar::PILLAR, i, j, m_floorModels[Floor::PILLER].get());
+				pillar = GetTaskManager()->AddTask<SerectPillar>(this);
+				pillar->Initialize(m_serectGame, SerectPillar::PILLAR, i, j, m_floorModels[SerectFloor::PILLER].get());
 				m_pillar.push_back(pillar);
 			}
 			// オブジェクトの種類によりタスク生成する
 			switch (m_stageData.object[j][i])
 			{
 			case OBJECT_ID::PLAYER:	// プレイヤー
-				if (!m_player)
-				{
-					m_player = GetTaskManager()->AddTask<Player>(this);
-					m_player->Initialize(m_playGame, i, j);
-					m_player->SetModel(Player::NORMAL, m_playerModels.get());
-				}
-				else
-				{
-					m_player->SerectNextPos(i,j);
-				}
-				m_floors[j][i]->SetState(Floor::LODE);
+				m_player = GetTaskManager()->AddTask<SerectPlayer>(this);
+				m_player->Initialize(m_serectGame, i, j);
+				m_player->SetModel(SerectPlayer::NORMAL, m_playerModels.get());
+				m_floors[j][i]->SetState(SerectFloor::LODE);
 				m_floorStack.push(m_floors[j][i]);
 				m_floorX = i; m_floorY = j;
-				m_startPosX = i; m_startPosY = j;
 
 				// 床との判定関数を登録
 				m_player->SetCheckFloorFunction([&](Object* object)
@@ -197,11 +189,9 @@ void Stage::SetStageData()
 				// 通過時の関数を登録
 				m_player->SetFloorMove([&](Object* object)
 				{
-					if (m_floors[m_floorY + m_player->GetNextPosY()][m_floorX + m_player->GetNextPosX()]->GetState() == Floor::NORMAL)
+					if (m_floors[m_floorY + m_player->GetNextPosY()][m_floorX + m_player->GetNextPosX()]->GetState() ==SerectFloor::NORMAL)
 					{
-						m_player->SetChengPosX(m_floorX + m_player->GetNextPosX());
-						m_player->SetChengPosY(m_floorY + m_player->GetNextPosY());
-						m_player->SetFloorChengFlag(true);
+						m_floors[m_floorY + m_player->GetNextPosY()][m_floorX + m_player->GetNextPosX()]->SetState(SerectFloor::LODE);
 						m_player->SetNextFloorPos(m_floors[m_floorY + m_player->GetNextPosY()][m_floorX + m_player->GetNextPosX()]->GetPosion());
 						m_floorStack.push(m_floors[m_floorY][m_floorX]);
 						m_floorX = m_floorX + m_player->GetNextPosX();
@@ -211,10 +201,7 @@ void Stage::SetStageData()
 					}
 					else if (m_floors[m_floorY + m_player->GetNextPosY()][m_floorX + m_player->GetNextPosX()] == m_floorStack.top())
 					{
-					
-						m_player->SetChengPosX(m_floorX);
-						m_player->SetChengPosY(m_floorY);
-						m_player->SetFloorChengFlag(false);
+						m_floors[m_floorY][m_floorX]->SetState(SerectFloor::NORMAL);
 						m_player->SetNextFloorPos(m_floorStack.top()->GetPosion());
 						m_floorStack.pop();
 						m_floorX = m_floorX + m_player->GetNextPosX();
@@ -226,23 +213,9 @@ void Stage::SetStageData()
 				// 戻る時の関数を登録
 				m_player->SetFloorBackMove([&](Object* object)
 				{
-					if (m_floors[m_floorY + m_player->GetNextPosY()][m_floorX + m_player->GetNextPosX()]->GetState() == Floor::PILLER)
+					if (m_floors[m_floorY + m_player->GetNextPosY()][m_floorX + m_player->GetNextPosX()]->GetState() == SerectFloor::PILLER)
 					{
 						m_player->SetFloorCheck(false);
-					}
-				});
-				m_player->SetChengeFloor([&](Object* object)
-				{
-					if (m_player->GetFloorChengFlag())
-					{
-						m_floors[m_player->GetChengPosY()][m_player->GetChengPosX()]->SetState(Floor::LODE);
-					}
-					else
-					{
-						if (m_floors[m_player->GetChengPosY()][m_player->GetChengPosX()] != m_floors[m_startPosY][m_startPosX])
-						{
-							m_floors[m_player->GetChengPosY()][m_player->GetChengPosX()]->SetState(Floor::NORMAL);
-						}
 					}
 				});
 				//m_player->SetFloorCheckBack([&](Object* object)
@@ -256,8 +229,8 @@ void Stage::SetStageData()
 				//});
 				break;
 			case OBJECT_ID::BALL:	// ボール
-				ball = GetTaskManager()->AddTask<Gimmick>(this);
-				ball->Initialize(m_playGame, Gimmick::BALL, i, j, m_ballModel.get());
+				ball = GetTaskManager()->AddTask<SerectGimmick>(this);
+				ball->Initialize(m_serectGame, SerectGimmick::BALL, i, j, m_ballModel.get());
 				// 床との判定関数を登録
 				ball->SetCheckFloorFunction([&](Object* object)
 				{
@@ -266,18 +239,18 @@ void Stage::SetStageData()
 				m_ball.push_back(ball);
 				break;
 			case OBJECT_ID::TRY:		// △柱
-				tryB = GetTaskManager()->AddTask<Gimmick>(this);
-				tryB->Initialize(m_playGame, Gimmick::TRY, i, j, m_tryModel.get());
+				tryB = GetTaskManager()->AddTask<SerectGimmick>(this);
+				tryB->Initialize(m_serectGame, SerectGimmick::TRY, i, j, m_tryModel.get());
 				m_try.push_back(tryB);
 				break;
 			case OBJECT_ID::NOTB:	// 進入禁止柱
-				notB = GetTaskManager()->AddTask<Gimmick>(this);
-				notB->Initialize(m_playGame, Gimmick::NOT, i, j, m_notModel.get());
+				notB = GetTaskManager()->AddTask<SerectGimmick>(this);
+				notB->Initialize(m_serectGame, SerectGimmick::NOT, i, j, m_notModel.get());
 				m_not.push_back(notB);
 				break;
 			case OBJECT_ID::GALE:	// ゴール
-				goal = GetTaskManager()->AddTask<Gimmick>(this);
-				goal->Initialize(m_playGame, Gimmick::GOAL, i, j, m_goalModel.get());
+				goal = GetTaskManager()->AddTask<SerectGimmick>(this);
+				goal->Initialize(m_serectGame, SerectGimmick::GOAL, i, j, m_goalModel.get());
 				// 床との判定関数を登録
 				goal->SetCheckFloorFunction([&](Object* object)
 				{
@@ -290,7 +263,7 @@ void Stage::SetStageData()
 	}
 }
 
-void Stage::ResetStageData()
+void SerectStage::ResetStageData()
 {
 	// 床をリセット
 	for (int j = 0; j < STAGE_H; j++)
@@ -306,20 +279,20 @@ void Stage::ResetStageData()
 		}
 	}
 	// パズルをリセット	
-	for (Gimmick* p : m_ball)
+	for (SerectGimmick* p : m_ball)
 	{
 		p->Reset();
 	}
-	for (Gimmick* p : m_try)
+	for (SerectGimmick* p : m_try)
 	{
 		p->Reset();
 	}
-	for (Gimmick* p : m_not)
+	for (SerectGimmick* p : m_not)
 	{
 		p->Reset();
 	}
-	//// プレイヤーをリセット
-	//if (m_player) m_player->Reset();
+	// プレイヤーをリセット
+	if (m_player) m_player->Reset();
 
 	// ゴールをリセット
 	for (Object* p : m_goal)
@@ -334,7 +307,7 @@ void Stage::ResetStageData()
 	}
 }
 
-bool Stage::CheckFloor(DirectX::SimpleMath::Vector3 pos, float w, float h)
+bool SerectStage::CheckFloor(DirectX::SimpleMath::Vector3 pos, float w, float h)
 {
 	int x, y;
 	const Vector2 corner[4] = { Vector2(-1.0f, -1.0f), Vector2(1.0f, -1.0f), Vector2(1.0f,  1.0f), Vector2(-1.0f,  1.0f) };
@@ -349,9 +322,9 @@ bool Stage::CheckFloor(DirectX::SimpleMath::Vector3 pos, float w, float h)
 	{
 		// 3D空間の座標をマップチップの位置に変換する
 		ConvertPosToMapChip(pos.x + w * corner[i].x, pos.z + h * corner[i].y, &x, &y);
-		Floor* floor = this->GetFloor(x, y);
+		SerectFloor* floor = this->GetFloor(x, y);
 		if ((floor != nullptr)
-			&& (floor->GetState() == Floor::State::NORMAL || floor->GetState() == Floor::State::LODE))
+			&& (floor->GetState() == SerectFloor::State::NORMAL || floor->GetState() ==SerectFloor::State::LODE))
 		{
 			break;
 		}
@@ -359,7 +332,7 @@ bool Stage::CheckFloor(DirectX::SimpleMath::Vector3 pos, float w, float h)
 	if (i == 4) return false;
 	return true;
 }
-bool Stage::CheckBackFloor(DirectX::SimpleMath::Vector3 pos, float w, float h)
+bool SerectStage::CheckBackFloor(DirectX::SimpleMath::Vector3 pos, float w, float h)
 {
 	int x, y;
 	const Vector2 corner[4] = { Vector2(-1.0f, -1.0f), Vector2(1.0f, -1.0f), Vector2(1.0f,  1.0f), Vector2(-1.0f,  1.0f) };
@@ -374,9 +347,9 @@ bool Stage::CheckBackFloor(DirectX::SimpleMath::Vector3 pos, float w, float h)
 	{
 		// 3D空間の座標をマップチップの位置に変換する
 		ConvertPosToMapChip(pos.x + w * corner[i].x, pos.z + h * corner[i].y, &x, &y);
-		Floor* floor = this->GetFloor(x, y);
+		SerectFloor* floor = this->GetFloor(x, y);
 		if ((floor != nullptr)
-			&& (floor->GetState() == Floor::State::LODE))
+			&& (floor->GetState() == SerectFloor::State::LODE))
 		{
 			break;
 		}
@@ -387,17 +360,17 @@ bool Stage::CheckBackFloor(DirectX::SimpleMath::Vector3 pos, float w, float h)
 
 
 
-void Stage::SetFloorPos(DirectX::SimpleMath::Vector3 pos, float w, float h)
+void SerectStage::SetFloorPos(DirectX::SimpleMath::Vector3 pos, float w, float h)
 {
 	m_floorPos.position = pos;
 	m_floorPos.wid = w;
 	m_floorPos.hei = h;
 }
 
-void Stage::DeleteAllObject()
+void SerectStage::DeleteAllObject()
 {
 	// 鍵を全て削除する
-	for (Gimmick* p : m_ball)
+	for (SerectGimmick* p : m_ball)
 	{
 		p->Kill();
 	}
@@ -425,12 +398,12 @@ void Stage::DeleteAllObject()
 	m_pillar.clear();
 
 	// 柱のギミックを全て削除する
-	for (Gimmick* p : m_try)
+	for (SerectGimmick* p : m_try)
 	{
 		p->Kill();
 	}
 	m_try.clear();
-	for (Gimmick* p : m_not)
+	for (SerectGimmick* p : m_not)
 	{
 		p->Kill();
 	}
@@ -443,14 +416,14 @@ void Stage::DeleteAllObject()
 	}
 }
 
-void Stage::ConvertPosToMapChip(float x, float z, int* floor_x, int* floor_y)
+void SerectStage::ConvertPosToMapChip(float x, float z, int* floor_x, int* floor_y)
 {
 	*floor_x = (int)floorf(x + 0.5f);
 	*floor_y = (int)floorf(z + 0.5f);
 }
 
 // ゴール条件関数
-bool Stage::GameEndCheck()
+bool SerectStage::GameEndCheck()
 {
 	for (int j = 0; j < STAGE_H; j++)
 	{
@@ -458,7 +431,7 @@ bool Stage::GameEndCheck()
 		{
 			if (m_stageData.object[j][i] == 1)
 			{
-				if (m_floors[j][i]->GetState() == Floor::NORMAL)
+				if (m_floors[j][i]->GetState() == SerectFloor::NORMAL)
 				{
 					return false;
 				}
@@ -466,10 +439,10 @@ bool Stage::GameEndCheck()
 			if (m_stageData.object[j][i] == 2)
 			{
 				int a = 0;
-				if (m_floors[j - 1][i]->GetState() != Floor::NORMAL)a++;
-				if (m_floors[j + 1][i]->GetState() != Floor::NORMAL)a++;
-				if (m_floors[j][i - 1]->GetState() != Floor::NORMAL)a++;
-				if (m_floors[j][i + 1]->GetState() != Floor::NORMAL)a++;
+				if (m_floors[j - 1][i]->GetState() != SerectFloor::NORMAL)a++;
+				if (m_floors[j + 1][i]->GetState() != SerectFloor::NORMAL)a++;
+				if (m_floors[j][i - 1]->GetState() != SerectFloor::NORMAL)a++;
+				if (m_floors[j][i + 1]->GetState() != SerectFloor::NORMAL)a++;
 				if (a > 1 || a == 0)
 				{
 					return false;
@@ -477,17 +450,17 @@ bool Stage::GameEndCheck()
 			}
 			if (m_stageData.object[j][i] == 3)
 			{
-				if (m_floors[j - 1][i]->GetState() != Floor::NORMAL)
+				if (m_floors[j - 1][i]->GetState() != SerectFloor::NORMAL)
 				{
 					return false;
 				}
-				if (m_floors[j + 1][i]->GetState() != Floor::NORMAL) {
+				if (m_floors[j + 1][i]->GetState() != SerectFloor::NORMAL) {
 					return false;
 				}
-				if (m_floors[j][i - 1]->GetState() != Floor::NORMAL) {
+				if (m_floors[j][i - 1]->GetState() != SerectFloor::NORMAL) {
 					return false;
 				}
-				if (m_floors[j][i + 1]->GetState() != Floor::NORMAL) {
+				if (m_floors[j][i + 1]->GetState() != SerectFloor::NORMAL) {
 					return false;
 				}
 			}

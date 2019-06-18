@@ -11,6 +11,7 @@
 #include "../TaskManager.h"
 
 class PlayGame;
+class SerectGame;
 
 // オブジェクトクラス
 class Object : public Task
@@ -33,6 +34,8 @@ protected:
 
 	// プレイへのポインタ
 	PlayGame* m_playgame;
+
+	SerectGame* m_serectgame;
 
 	// モデルデータへのポインタ
 	DirectX::Model* m_model;

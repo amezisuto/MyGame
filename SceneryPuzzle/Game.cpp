@@ -78,6 +78,9 @@ void Game::Update(DX::StepTimer const& timer)
 	float elapsedTime = float(timer.GetElapsedSeconds());
 
 	System::InputManager::GetInstance().Update();
+	auto kb = Keyboard::Get().GetState();
+	// ESCキーが押されたら強制終了
+	if (kb.Escape) ExitGame();
 
 	// シーンマネージャーの更新-------------------
 	m_sceneManager->UpdateActiveScene(timer);

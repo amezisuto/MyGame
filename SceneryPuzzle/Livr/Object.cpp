@@ -42,7 +42,7 @@ void Object::Render()
 
 	// ƒ‚ƒfƒ‹‚Ì•`‰æ
 	m_model->Draw(game->GetContext(), *game->GetStates()
-		, world, m_playgame->GetGame()->GetView(), m_playgame->GetGame()->GetProjection());
+		, world, m_playgame->GetViewMatrix(), m_playgame->GetProjectionMatrix());
 }
 
 float Object::GetHitForce()

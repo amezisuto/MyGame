@@ -6,14 +6,14 @@
 #include <vector>
 #include <stack>
 #include "../TaskManager.h"
-#include "Floor.h"
-#include "Player.h"
-#include "Pillar.h"
-#include "Gimmick.h"
+#include "SerectFloor.h"
+#include "SerectPlayer.h"
+#include "SerectPillar.h"
+#include "SerectGimmick.h"
 class Game;
 class PlayGame;
 
-class Stage : public Task
+class SerectStage : public Task
 {
 public:
 	// オブジェクトＩＤ
@@ -48,31 +48,31 @@ private:
 	//	ゲームのポインター
 	Game* m_game;
 	//  ゲームシーンのポインター
-	PlayGame* m_playGame;
+	SerectGame* m_serectGame;
 
 	// 床タスクへのポインタ
-	Floor* m_floors[STAGE_H][STAGE_W];
-	Floor* m_floorsRecode[STAGE_H][STAGE_W];;
+	SerectFloor* m_floors[STAGE_H][STAGE_W];
+	SerectFloor* m_floorsRecode[STAGE_H][STAGE_W];;
 
 	// プレイヤータスクへのポインタ
-	Player* m_player;
+	SerectPlayer* m_player;
 
 	// ゴールタスクへのポインタ
-	std::vector<Gimmick*> m_goal;
+	std::vector<SerectGimmick*> m_goal;
 
 	// タスクへのポインタ
-	std::vector<Gimmick*> m_ball;
+	std::vector<SerectGimmick*> m_ball;
 
-	std::vector<Gimmick*> m_try;
+	std::vector<SerectGimmick*> m_try;
 
-	std::vector<Gimmick*> m_not;
+	std::vector<SerectGimmick*> m_not;
 
 	std::vector<Object*> m_pillar;
 
 	//----- モデルへのポインタ -----//
 
 	// 床のモデル
-	std::unique_ptr<DirectX::Model> m_floorModels[Floor::STATE_NUM];
+	std::unique_ptr<DirectX::Model> m_floorModels[SerectFloor::STATE_NUM];
 
 	// オブジェクトの影のモデル
 	std::unique_ptr<DirectX::Model> m_shadowModel;
@@ -98,27 +98,26 @@ private:
 	// フロアの保存用データ
 	FloorPosion m_floorPos;
 
-	std::stack<Floor*> m_floorStack;
+	std::stack<SerectFloor*> m_floorStack;
 	int m_floorX, m_floorY;
-	int m_startPosX, m_startPosY;
 
 	TaskManager m_playTM;
 
 public:
 	// コンストラクタ
-	Stage();
+	SerectStage();
 
 	// 初期化関数
-	void Initialize(PlayGame* playGame);
+	void Initialize(SerectGame* serectGame);
 
 	// ゲームウインドウのポインタを取得する関数
-	PlayGame* GetPlayGame() { return m_playGame; }
+	SerectGame* GetPlayGame() { return m_serectGame; }
 
 	// ゲームオブジェクトのポインタを取得する関数
 	Game* GetGame();
 
 	// 床タスク取得関数
-	Floor* GetFloor(int x, int y);
+	SerectFloor* GetFloor(int x, int y);
 
 	// ステージデータの読み込み関数
 	bool LoadStageData(wchar_t* fname);
@@ -130,7 +129,7 @@ public:
 	void ResetStageData();
 
 	// プレイヤーの取得関数
-	Player* GetPlayer() { return m_player; }
+	SerectPlayer* GetPlayer() { return m_player; }
 
 	// ゴールの取得関数
 	//const std::vector<Object*>& GetEnemyList() { return m_goal; }
@@ -140,7 +139,7 @@ public:
 	bool CheckFloorAnd(DirectX::SimpleMath::Vector3 pos, float w, float h);
 
 	// ゴールの取得関数
-	const std::vector<Gimmick*>& GetGoalList() { return m_goal; }
+	const std::vector<SerectGimmick*>& GetGoalList() { return m_goal; }
 
 private:
 	// 通過チェック関数

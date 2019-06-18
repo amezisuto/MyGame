@@ -5,9 +5,9 @@
 
 #include "../Livr/Object.h"
 #include "../TaskManager.h"
-class Stage;
+class SerectStage;
 
-class Floor : public Task
+class SerectFloor : public Task
 {
 public:
 	// 床の状態
@@ -26,7 +26,7 @@ public:
 
 private:
 	// ステージへのポインタ
-	Stage* m_stage;
+	SerectStage* m_stage;
 
 	// モデルデータへのポインタ
 	DirectX::Model* m_models[STATE_NUM];
@@ -53,10 +53,10 @@ public:
 	// タスク消去関数
 	virtual void Alive() { m_killFlag = false; }
 	// コンストラクタ
-	Floor();
+	SerectFloor();
 
 	// 初期化関数
-	void Initialize(Stage* stage, int x, int y);
+	void Initialize(SerectStage* stage, int x, int y);
 
 	// 更新関数
 	bool Update(float elapsedTime) override;
@@ -68,10 +68,10 @@ public:
 	void SetModel(State state, DirectX::Model* model);
 
 	// 床の状態を設定する関数
-	void SetState(Floor::State state) { m_state = state; }
+	void SetState(SerectFloor::State state) { m_state = state; }
 
 	// 床の状態を取得する関数
-	Floor::State GetState() { return m_state; }
+	SerectFloor::State GetState() { return m_state; }
 
 	DirectX::SimpleMath::Vector3 GetPosion() { return m_pos; }
 

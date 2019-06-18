@@ -5,7 +5,7 @@
 
 #include "../Livr/Object.h"
 #include "../TaskManager.h"
-class Player : public Object
+class SerectPlayer : public Object
 {
 public:
 	// プレイヤーのタイプ別モデル
@@ -20,10 +20,9 @@ public:
 	{
 		STATE_NORMAL,	// 通常
 		STATE_JUMP,		// ジャンプ中
-		STATE_HIT,	
-		STATE_DEAD,
-		STATE_SERECTJUMP,
-		STATE_NEXTJUMP,
+		STATE_HIT,		// 吹き飛ばされ状態
+		STATE_FALL,		// 落下中
+		STATE_DEAD,		// 死亡
 	};
 
 	// 
@@ -92,9 +91,6 @@ private:
 	std::function<void(Object*)> m_floorCheckBack;
 
 	// 戻る時に呼ばれる関数
-	std::function<void(Object*)> m_floorCheng;
-
-	// 戻る時に呼ばれる関数
 	std::function<void(Object*)> m_playerKey;
 
 	STATE_END m_clear;
@@ -104,12 +100,6 @@ private:
 	Pos m_nextPos;
 
 	bool m_notMoveFlag;
-
-	Pos m_serectNextPos;
-
-	Pos m_chengeFloortPos;
-
-	bool m_floorChengeFlag;
 
 
 	DirectX::SimpleMath::Vector3 m_target; // 移動先
@@ -123,10 +113,10 @@ private:
 
 public:
 	// コンストラクタ
-	Player();
+	SerectPlayer();
 
 	// 初期化関数
-	void Initialize(PlayGame* playGame, int x, int y);
+	void Initialize(SerectGame* serectGame, int x, int y);
 
 	// モデル設定関数
 	void SetModel(ModelType modelType, DirectX::Model* model);
@@ -147,15 +137,11 @@ public:
 	void OnHit(Object* object) override;
 
 	// プレイヤーの状態を取得する関数
-	Player::STATE GetState();
-
-	Player::STATE_END GetStateEnd();
+	SerectPlayer::STATE GetState();
+	SerectPlayer::STATE_END GetStateEnd();
 
 	// プレイヤーの移動関数
 	void Move(float elapsedTime, const DirectX::Keyboard::KeyboardStateTracker& tracker);
-
-	// ステージ選択中の移動関数
-	void SerectMove(float elapsedTime, const DirectX::Keyboard::KeyboardStateTracker& tracker);
 
 	// 移動時に呼ばれる関数を設定する関数
 	void SetFloorMove(std::function<void(Object*)> func);
@@ -166,9 +152,6 @@ public:
 	// ジャンプ終了時に呼ばれる関数を設定する関数
 	void SetFloorCheckBack(std::function<void(Object*)> func);
 
-	// 床替え時に呼ばれる関数を設定する関数
-	void SetChengeFloor(std::function<void(Object*)> func);
-
 	// リセット関数
 	void Reset();
 	void SetFloorCheck(bool flag);
@@ -178,31 +161,14 @@ public:
 	void SetNextPosX(int x);
 	void SetNextPosY(int y);
 
-	void SetChengPosX(int x);
-	void SetChengPosY(int y);
-
 	int GetNextPosX();
 	int GetNextPosY();
-
-	int GetChengPosX();
-	int GetChengPosY();
-
-	void SetFloorChengFlag(bool flag) { m_floorChengeFlag = flag; }
-	bool GetFloorChengFlag() { return m_floorChengeFlag; }
 
 
 
 	void SetNextFloorPos(DirectX::SimpleMath::Vector3 pos);
 
 	void State_Jump(float elapsedTime);
-	void Serect_Jump(float elapsedTime);
-	void Next_Jump(float elapsedTime);
-
-	void SetJumpConter() { m_jumpCounter = JUMP_FRAME; }
-
-	void SerectNextPos(int x,int y);
-
-	void SetNextState() { m_state = STATE_NEXTJUMP; }
 
 
 private:

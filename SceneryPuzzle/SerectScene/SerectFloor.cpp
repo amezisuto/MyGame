@@ -7,31 +7,31 @@
 // Author: Takeshi Yamaguthi
 //--------------------------------------------------------------------------------------
 #include "../pch.h"
-#include "Floor.h"
+#include "SerectFloor.h"
 #include "../Game.h"
-#include "PlayGame.h"
-#include "Stage.h"
+#include "SerectGame.h"
+#include "SerectStage.h"
 
 // ダメージの移行時間
-const float Floor::LODE_DELAY_TIME = 0.2f;
+const float SerectFloor::LODE_DELAY_TIME = 0.2f;
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
-Floor::Floor()
+SerectFloor::SerectFloor()
 	: m_stage(nullptr), m_models{ nullptr }, m_state(NONE), m_lodeFlag(false), m_lodeTimer(0.0f), m_killFlag(false)
 {	
 	// 描画順の設定
-	SetOt(PlayGame::OT_STAGE);
+	SetOt(SerectGame::OT_STAGE);
 }
 
-void Floor::Initialize(Stage * stage, int x, int y)
+void SerectFloor::Initialize(SerectStage * stage, int x, int y)
 {
 	m_stage = stage;
 	m_pos = Vector3((float)x, 0.0f, (float)y);
 }
 
-bool Floor::Update(float elapsedTime)
+bool SerectFloor::Update(float elapsedTime)
 {
 	if (m_killFlag == true) return false;
 	// 床フラグを落とす
@@ -47,10 +47,10 @@ bool Floor::Update(float elapsedTime)
 			switch (m_state)
 			{
 			case NORMAL:	// 通常
-				m_state = Floor::LODE;	// 通過済み
+				m_state = SerectFloor::LODE;	// 通過済み
 				break;
 			case LODE:	// 通路
-				m_state = Floor::NORMAL;		// 戻る
+				m_state = SerectFloor::NORMAL;		// 戻る
 				break;
 			default:
 				break;
@@ -59,21 +59,21 @@ bool Floor::Update(float elapsedTime)
 	}
 
 	//// 落下状態の場合は床を下に落とす
-	//if (m_state == Floor::FALL)
+	//if (m_state == SerectFloor::FALL)
 	//{
 	//	m_pos.y -= 0.1f;
 
 	//	// ある程度落下したら消す
 	//	if (m_pos.y < -3.0f)
 	//	{
-	//		m_state = Floor::DEAD;
+	//		m_state = SerectFloor::DEAD;
 	//	}
 	//}
 
 	return true;
 }
 
-void Floor::Render()
+void SerectFloor::Render()
 {
 	if (!m_stage || !m_models[m_state]) return;
 
@@ -98,12 +98,12 @@ void Floor::Render()
 
 }
 
-void Floor::SetModel(State state, DirectX::Model * model)
+void SerectFloor::SetModel(State state, DirectX::Model * model)
 {
 	m_models[state] = model;
 }
 
-void Floor::Lode()
+void SerectFloor::Lode()
 {
 	// １フレームに移動は１度だけ
 	if (m_lodeFlag) return;
@@ -113,12 +113,12 @@ void Floor::Lode()
 	m_lodeTimer = LODE_DELAY_TIME;
 }
 
-void Floor::Reset()
+void SerectFloor::Reset()
 {
 	m_pos.y = 0.0f;
-	if (m_state != Floor::NONE)
+	if (m_state != SerectFloor::NONE)
 	{
-		m_state = Floor::NORMAL;
+		m_state = SerectFloor::NORMAL;
 		m_lodeFlag = false;
 		m_lodeTimer = 0.0f;
 	}

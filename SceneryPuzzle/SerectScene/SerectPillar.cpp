@@ -1,21 +1,21 @@
-#include "Pillar.h"
-#include "PlayGame.h"
+#include "SerectPillar.h"
+#include "SerectGame.h"
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
 // 床との判定用の幅と高さ
-const float Pillar::WIDTH = 0.2f;
-const float Pillar::HEIGHT = 0.2f;
+const float SerectPillar::WIDTH = 0.2f;
+const float SerectPillar::HEIGHT = 0.2f;
 
 
-Pillar::Pillar()
+SerectPillar::SerectPillar()
 {
 }
 
-void Pillar::Initialize(PlayGame* playGame, Kind kind, int x, int y, DirectX::Model * model)
+void SerectPillar::Initialize(SerectGame* serectGame, Kind kind, int x, int y, DirectX::Model * model)
 {
-	m_playgame = playGame;
+	m_serectgame = serectGame;
 	m_model = model;
 	m_x = x;
 	m_y = y;
@@ -32,31 +32,31 @@ void Pillar::Initialize(PlayGame* playGame, Kind kind, int x, int y, DirectX::Mo
 	m_radius = 0.4f;
 
 	// 幅と高さ
-	m_w = Pillar::WIDTH;
-	m_h = Pillar::HEIGHT;
+	m_w = SerectPillar::WIDTH;
+	m_h = SerectPillar::HEIGHT;
 }
 
-bool Pillar::Update(float elapsedTime)
+bool SerectPillar::Update(float elapsedTime)
 {
 	if (m_killFlag == true) return false;
 	if (!m_activeFlag) return true;
 
 	// 衝突判定マネージャーに登録
-	m_playgame->AddCollision(this);
+	m_serectgame->AddCollision(this);
 
 	return true;
 }
 
 
-Object::OBJECT_ID Pillar::GetID()
+Object::OBJECT_ID SerectPillar::GetID()
 {
 	return Object::PILLAR;
 }
 
-void Pillar::Reset()
+void SerectPillar::Reset()
 {
 	// 再び取ってない状態に戻す
 	m_dir = 0;
 	m_pos = Vector3((float)m_x, 0.0f, (float)m_y);
-	SetOt(PlayGame::OT_OBJECT);
+	SetOt(SerectGame::OT_OBJECT);
 }

@@ -4,9 +4,9 @@
 #pragma once
 
 #include "../Livr/Object.h"
-class PlayGame;
+class Serectame;
 
-class Gimmick : public Object
+class SerectGimmick : public Object
 {
 public:
 	// ƒMƒ~ƒbƒN‚ÌŽí—Þ
@@ -28,9 +28,8 @@ private:
 	Kind m_kind;
 
 public:
-	Gimmick();
-	~Gimmick();
-	void Initialize(PlayGame* playGame, Kind kind, int x, int y, DirectX::Model * model);
+	SerectGimmick();
+	void Initialize(SerectGame* serectGame, Kind kind, int x, int y, DirectX::Model * model);
 
 	bool Update(float elapsedTime)override;
 

@@ -1,4 +1,4 @@
-#include "GameScene.h"
+#include "SerectScene.h"
 #include "SceneManager.h"
 #include "../Game.h"
 #include "../InputManager.h"
@@ -14,31 +14,31 @@ using Microsoft::WRL::ComPtr;
 /// コンストラクタ
 /// </summary>
 /// <param name="sceneManager">登録されているシーンマネージャー</param>
-GameScene::GameScene(SceneManager* sceneManager)
+SerectScene::SerectScene(SceneManager* sceneManager)
 	: SceneBase(sceneManager)
 {
 
-	
+
 }
 
 
 /// <summary>
 /// デストラクタ
 /// </summary>
-GameScene::~GameScene()
+SerectScene::~SerectScene()
 {
-	
+
 }
 
 
 /// <summary>
 /// ゲームシーンの初期化
 /// </summary>
-void GameScene::Initialize()
+void SerectScene::Initialize()
 {
 	// ゲームの初期化----------------------------------------
-		m_playGmae = m_gameTM.AddTask<PlayGame>();
-		m_playGmae->Initialize(m_sceneManager->GetGame());
+	m_serectGmae = m_gameTM.AddTask<SerectGame>();
+	m_serectGmae->Initialize(m_sceneManager->GetGame());
 	//---------------------------------------------------
 	// 床の初期化----------------------------------------
 	//m_floor = GetTaskManager()->AddTask<Floor>(this);
@@ -66,10 +66,10 @@ void GameScene::Initialize()
 /// <summary>
 /// ゲームシーンの後始末処理
 /// </summary>
-void GameScene::Finalize()
+void SerectScene::Finalize()
 {
 	// ポインターを破棄------------------
-	m_sceneManager->PtrDel(m_playGmae);
+	m_sceneManager->PtrDel(m_serectGmae);
 	//m_sceneManager->PtrDel(m_gimmick);
 	//m_sceneManager->PtrDel(m_playBg);
 	//m_sceneManager->PtrDel(m_player);
@@ -86,17 +86,17 @@ void GameScene::Finalize()
 /// ゲームシーンの更新処理
 /// </summary>
 /// <param name="timer">時間情報</param>
-void GameScene::Update(DX::StepTimer const& timer)
+void SerectScene::Update(DX::StepTimer const& timer)
 {
 	auto kb = System::InputManager::GetInstance().GetKeyState();
 	float elapsedTime = float(timer.GetElapsedSeconds());
 	// 更新処理--------------------------------------------------
 	m_gameTM.Update(elapsedTime);	// 床の更新
-	//m_gimmick->Update(elapsedTime);		// ギミックの更新
-	//m_playBg->Update(elapsedTime);		// 背景の更新
-	//m_player->Update(elapsedTime);		// プレイヤーの更新
-	//m_stage->Update(elapsedTime);		// ステージの更新
-	// ----------------------------------------------------------
+									//m_gimmick->Update(elapsedTime);		// ギミックの更新
+									//m_playBg->Update(elapsedTime);		// 背景の更新
+									//m_player->Update(elapsedTime);		// プレイヤーの更新
+									//m_stage->Update(elapsedTime);		// ステージの更新
+									// ----------------------------------------------------------
 }
 
 
@@ -105,7 +105,7 @@ void GameScene::Update(DX::StepTimer const& timer)
 /// <summary>
 /// ゲームシーンの描画処理
 /// </summary>
-void GameScene::Render()
+void SerectScene::Render()
 {
 
 	// 描画処理-----------------------------------------
@@ -116,11 +116,11 @@ void GameScene::Render()
 	//m_player->Render();		// プレイヤーの描画
 	//m_stage->Render();		// ステージの描画
 	//--------------------------------------------------
-	
+
 }
 
-Game* GameScene::GetGame()
+Game* SerectScene::GetGame()
 {
-	return m_sceneManager->GetGame(); 
+	return m_sceneManager->GetGame();
 }
 

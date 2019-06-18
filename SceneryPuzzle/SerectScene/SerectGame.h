@@ -1,11 +1,10 @@
 ﻿#pragma once
-#include "PlayBg.h"
+#include "SerectBg.h"
 #include "../TaskManager.h"
-#include "CollisionManager.h"
-#include "PlayCamera.h"
+#include "../PlayScene/CollisionManager.h"
 class Game;
-class Stage;
-class PlayGame : public Task
+class SerectStage;
+class SerectGame : public Task
 {
 public:
 	// 画面サイズ
@@ -19,12 +18,10 @@ public:
 	enum GAME_STATE
 	{
 		STATE_NONE,			// 最初
-		STATE_SERECT,		// ステージセレクト
 		STATE_START,		// 開始
 		STATE_GAME,			// ゲーム中
 		STATE_AGAIN,		// 死んだので再チャレンジ
 		STATE_NEXT,			// 次のステージへ
-		STATE_CHENGE,
 	};
 
 	// 描画順
@@ -61,7 +58,6 @@ private:
 	// ゲームの状態
 	GAME_STATE m_gameState;
 
-	PlayCamera* m_playCamera;
 
 	// ビュー行列
 	DirectX::SimpleMath::Matrix m_view;
@@ -70,10 +66,10 @@ private:
 	DirectX::SimpleMath::Matrix m_projection;
 
 	// 背景
-	PlayBg* m_bg;
+	SerectBg* m_bg;
 
 	// ステージ
-	Stage* m_stage;
+	SerectStage* m_stage;
 
 	// 衝突判定用オブジェクト
 	CollisionManager* m_collisionManager;
@@ -104,11 +100,9 @@ private:
 	// BGMハンドル
 	int m_bgm;
 
-	int m_nextCount;
-
 public:
 	// コンストラクタ
-	PlayGame();
+	SerectGame();
 
 	// 初期化関数
 	void Initialize(Game* game);
@@ -132,7 +126,7 @@ public:
 	void AddCollision(Object* object);
 
 	// ステージタスク取得関数
-	Stage* GetStage() { return m_stage; }
+	SerectStage* GetStage() { return m_stage; }
 
 	// エフェクト用ベーシックエフェクトを取得する関数
 	DirectX::BasicEffect* GetBatchEffect() { return m_batchEffect.get(); }
@@ -156,23 +150,14 @@ public:
 	// ゲームの初期化関数
 	GAME_STATE InitializeGame(float elapsedTime);
 
-	// ステージ選択中の関数
-	GAME_STATE SerectGame(float elapsedTime);
-
 	// ゲームをスタートさせる関数
 	GAME_STATE StartGame(float elapsedTime);
 
 	// ゲーム中の関数
 	GAME_STATE GamePlay(float elapsedTime);
 
-	// もう一度
-	GAME_STATE AgeinGame(float elapsedTime);
-
 	// 次のステージへ
 	GAME_STATE NextGame(float elapsedTime);
-
-	// もう一度
-	GAME_STATE ChengeGame(float elapsedTime);
 
 	private:
 		// ステージデータのファイル名を取得する関数
